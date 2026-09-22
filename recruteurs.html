@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Qui recrute — les métiers du marketing</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="assets/commun.css?v=3">
+<link rel="stylesheet" href="assets/commun.css?v=4">
 </head>
 <body>
 <main>
@@ -18,7 +18,8 @@
   <div class="grille" style="margin-top:24px">
     <div class="carte"><h3>Entreprises qui publient le plus</h3><div class="zone"><canvas id="g-entreprises"></canvas></div></div>
     <div class="carte"><h3>Secteurs d'activité <small>— quand l'annonce le précise</small></h3><div class="zone"><canvas id="g-secteurs"></canvas></div></div>
-    <div class="carte large"><h3>Niveau de poste par métier <small>— qui cherche des juniors, qui cherche des directeurs</small></h3><div class="zone haute"><canvas id="g-niveau-metier"></canvas></div></div>
+    <div class="carte large"><h3>Qui recrute des débutants ? <small id="sous-juniors">— les employeurs qui publient le plus d'offres ouvertes à quelqu'un sans expérience</small></h3><div class="zone haute"><canvas id="g-juniors"></canvas></div>
+      <p class="note">Une offre est comptée ici si elle est en alternance, ou si l'annonce indique « débutant accepté ». Ce sont les premiers noms à qui écrire quand on sort de formation — en gardant en tête que certains de ces publieurs sont des écoles ou des agences qui recrutent pour le compte d'autres entreprises.</p></div>
   </div>
 
   <h2>Les dernières offres <small id="nb-offres"></small></h2>
@@ -28,7 +29,7 @@
   <footer id="pied"></footer>
 </main>
 
-<script src="assets/commun.js?v=3"></script>
+<script src="assets/commun.js?v=4"></script>
 <script>
 /* ============ Qui recrute ============ */
 function rendre(offres, D) {
@@ -40,11 +41,29 @@ function rendre(offres, D) {
   barres("g-entreprises", ent.map(x => enLignes(x[0], 26)), ent.map(x => x[1]), true, " offres");
   const sec = compter(offres, o => secteurCourt(o.secteur)).slice(0, 8);
   barres("g-secteurs", sec.map(x => enLignes(x[0], 26)), sec.map(x => x[1]), true, " offres");
-  const topMetiers = compter(offres, o => o.rome).slice(0, 12);
-  zoneSelonBarres("g-niveau-metier", topMetiers.length, 52);  // 12 métiers empilés + la légende
-  empilees("g-niveau-metier",
-    topMetiers.map(([code]) => enLignes((lib[code] && lib[code].libelle) || code, 30)),
-    topMetiers.map(([code]) => offres.filter(o => o.rome === code)), true);
+  /* Qui recrute des débutants : les employeurs nommés, classés par nombre d'offres ouvertes
+     à quelqu'un sans expérience (alternance, ou « débutant accepté »). Deux barres distinctes :
+     postuler à une alternance et postuler à un CDI junior ne sont pas la même démarche. */
+  const juniors = offres.filter(o => o.alternance || debutantAccepte(o));
+  const ouvertes = juniors.filter(o => o.entreprise);   // les autres ne nomment pas l'employeur
+  const topJuniors = compter(ouvertes, o => o.entreprise).slice(0, 12);
+  zoneSelonBarres("g-juniors", topJuniors.length, 40);
+  const lots = topJuniors.map(([nom]) => ouvertes.filter(o => o.entreprise === nom));
+  dessiner("g-juniors", "bar",
+    { labels: topJuniors.map(x => enLignes(x[0], 30)),
+      datasets: [
+        { label: "Alternance", backgroundColor: COUL_NIV.assistant, borderRadius: 3,
+          data: lots.map(l => l.filter(o => o.alternance).length) },
+        { label: "Débutant accepté", backgroundColor: COUL_NIV.charge, borderRadius: 3,
+          data: lots.map(l => l.filter(o => !o.alternance).length) },
+      ].filter(d => d.data.some(v => v > 0)) },
+    { indexAxis: "y",
+      plugins: { legend: { display: true, position: "bottom", labels: { boxWidth: 12, boxHeight: 12, padding: 12 } },
+                 tooltip: { callbacks: { label: c => `${c.dataset.label} : ${c.parsed.x} offre${c.parsed.x > 1 ? "s" : ""}` } } },
+      scales: { x: { stacked: true, beginAtZero: true, title: { display: true, text: "nombre d'offres" } },
+                y: { stacked: true, grid: { display: true } } } });
+  document.getElementById("sous-juniors").textContent =
+    `— ${juniors.length} offres de votre sélection sont ouvertes à quelqu'un sans expérience ; ${ouvertes.length} nomment leur employeur, voici ceux qui en publient le plus`;
 
   /* ---- Dernières offres ---- */
   const recentes = [...offres].sort((a, b) => (b.date || "").localeCompare(a.date || "")).slice(0, 12);
