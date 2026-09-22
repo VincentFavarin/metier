@@ -1,0 +1,40 @@
+# La veille : chaque matin, GitHub lance l'extraction France Travail sur ses machines,
+# met à jour data/ et le résumé de la page, et enregistre le tout par un commit.
+# Les identifiants sont dans Settings -> Secrets and variables -> Actions (FT_CLIENT_ID, FT_CLIENT_SECRET).
+name: veille
+
+on:
+  schedule:
+    - cron: "0 5 * * *"       # 5 h UTC = 7 h à Paris en été (6 h en hiver) ; GitHub ne connaît que l'UTC
+  workflow_dispatch:          # et le bouton « Run workflow » pour lancer à la main
+
+permissions:
+  contents: write             # le workflow doit pouvoir pousser son commit
+
+jobs:
+  extraire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Extraire les offres et refaire le résumé
+        env:
+          FT_CLIENT_ID: ${{ secrets.FT_CLIENT_ID }}
+          FT_CLIENT_SECRET: ${{ secrets.FT_CLIENT_SECRET }}
+        run: |
+          python scripts/extraire.py
+          python scripts/resumer.py
+
+      - name: Enregistrer la donnée du jour (commit + push)
+        run: |
+          git config user.name "veille-bot"
+          git config user.email "actions@github.com"
+          git add data
+          git commit -m "veille : offres du $(date -u +%Y-%m-%d)" || echo "rien de nouveau"
+          git push

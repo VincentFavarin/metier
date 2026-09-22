@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chargé de marketing digital — le marché, lu dans les offres</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root { --encre:#1d1d1f; --gris:#6e6e73; --fond:#f5f5f7; --carte:#fff; --accent:#0a5cff; --trait:#e5e5ea; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--encre); background:var(--fond); }
+  main { max-width:1080px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:1.9rem; margin:0 0 4px; }
+  h2 { font-size:1.15rem; margin:40px 0 12px; }
+  .sous { color:var(--gris); margin:0 0 24px; }
+  .chiffres { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:12px; }
+  .chiffre { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; }
+  .chiffre b { display:block; font-size:2rem; line-height:1.1; color:var(--accent); }
+  .chiffre span { color:var(--gris); font-size:.9rem; }
+  .grille { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; }
+  .carte { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; }
+  .carte h3 { margin:0 0 8px; font-size:1rem; }
+  canvas { max-height:320px; }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; background:var(--carte); border:1px solid var(--trait); border-radius:12px; overflow:hidden; }
+  th, td { text-align:left; padding:8px 10px; border-top:1px solid var(--trait); vertical-align:top; }
+  th { background:var(--fond); border-top:0; font-weight:600; }
+  a { color:var(--accent); text-decoration:none; }
+  .note { color:var(--gris); font-size:.9rem; }
+  footer { margin-top:48px; color:var(--gris); font-size:.85rem; border-top:1px solid var(--trait); padding-top:16px; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="titre">Chargé / Chargée de marketing digital</h1>
+  <p class="sous" id="sous">Chargement des données…</p>
+
+  <div class="chiffres" id="chiffres"></div>
+
+  <h2>Où sont les offres</h2>
+  <div class="grille">
+    <div class="carte"><h3>Par département</h3><canvas id="g-departements"></canvas></div>
+    <div class="carte"><h3>Par type de contrat</h3><canvas id="g-contrats"></canvas></div>
+  </div>
+
+  <h2>Ce que les annonces demandent</h2>
+  <div class="grille">
+    <div class="carte"><h3>Outils et compétences cités (% des offres)</h3><canvas id="g-outils"></canvas></div>
+    <div class="carte"><h3>Compétences codées par France Travail</h3><canvas id="g-competences"></canvas></div>
+  </div>
+
+  <h2>Le marché bouge</h2>
+  <div class="grille">
+    <div class="carte"><h3>Nombre d'offres à chaque extraction</h3><canvas id="g-serie"></canvas>
+      <p class="note" id="note-serie"></p></div>
+    <div class="carte"><h3>Entreprises qui publient le plus</h3><canvas id="g-entreprises"></canvas></div>
+  </div>
+
+  <h2>Les offres du jour</h2>
+  <table id="offres"><thead><tr><th>Intitulé</th><th>Entreprise</th><th>Lieu</th><th>Contrat</th><th>Salaire affiché</th><th>Publiée</th></tr></thead><tbody></tbody></table>
+
+  <h2>Ce que ces chiffres n'autorisent pas à conclure</h2>
+  <p class="note">Un seul canal : France Travail n'héberge pas toutes les offres cadres (APEC, LinkedIn, Welcome to the Jungle en publient d'autres).
+  Les salaires sont ceux des offres qui les affichent, souvent moins d'un tiers : biais probable vers le bas et vers les PME.
+  Une mention « IA » dans une annonce n'est pas une compétence exigée : il faut lire dix annonces pour dire ce que le mot recouvre.
+  La grille d'outils est la nôtre, elle est dans <code>scripts/resumer.py</code>.</p>
+
+  <footer id="pied"></footer>
+</main>
+
+<script>
+const euro = n => n == null ? "—" : n.toLocaleString("fr-FR") + " €";
+const couleur = "#0a5cff", pale = "rgba(10,92,255,.25)";
+Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', sans-serif";
+Chart.defaults.plugins.legend.display = false;
+
+function barres(id, etiquettes, valeurs, horizontal = true, suffixe = "") {
+  new Chart(document.getElementById(id), {
+    type: "bar",
+    data: { labels: etiquettes, datasets: [{ data: valeurs, backgroundColor: couleur, borderRadius: 4 }] },
+    options: { indexAxis: horizontal ? "y" : "x", responsive: true,
+      plugins: { tooltip: { callbacks: { label: c => c.parsed[horizontal ? "x" : "y"] + suffixe } } },
+      scales: { x: { grid: { display: !horizontal } }, y: { grid: { display: horizontal } } } }
+  });
+}
+
+fetch("data/resume.json").then(r => r.json()).then(d => {
+  document.getElementById("titre").textContent = d.metier + " — le marché, lu dans les offres";
+  document.getElementById("sous").innerHTML =
+    `Code ROME <b>${d.rome}</b> · ${d.source} · requête <code>${JSON.stringify(d.requete)}</code> · extraction du <b>${d.date}</b>`;
+
+  const s = d.salaire;
+  const cartes = [
+    [d.total_api, "offres actives en France"],
+    [d.puy_de_dome, "dans le Puy-de-Dôme"],
+    [d.auvergne_rhone_alpes, "en Auvergne-Rhône-Alpes"],
+    [s.part_affichant + " %", `des offres affichent un salaire (${s.offres_affichant})`],
+    [s.min_median ? euro(s.min_median) + " → " + euro(s.max_median) : "—", "salaire annuel affiché, médiane des minima → des maxima"],
+    [d.teletravail_mentionne, "annonces qui mentionnent le télétravail"],
+  ];
+  document.getElementById("chiffres").innerHTML = cartes.map(([v, l]) => `<div class="chiffre"><b>${v}</b><span>${l}</span></div>`).join("");
+
+  barres("g-departements", d.departements.map(x => x[0]), d.departements.map(x => x[1]));
+  barres("g-contrats", d.contrats.map(x => x[0]), d.contrats.map(x => x[1]), false);
+  barres("g-outils", d.outils.map(x => x.nom), d.outils.map(x => x.part), true, " %");
+  barres("g-competences", d.competences.map(x => x[0].length > 45 ? x[0].slice(0, 44) + "…" : x[0]), d.competences.map(x => x[1]));
+  barres("g-entreprises", d.entreprises.map(x => x[0].length > 30 ? x[0].slice(0, 29) + "…" : x[0]), d.entreprises.map(x => x[1]));
+
+  new Chart(document.getElementById("g-serie"), {
+    type: "line",
+    data: { labels: d.serie.map(x => x.date), datasets: [{ data: d.serie.map(x => x.total), borderColor: couleur, backgroundColor: pale, fill: true, tension: .2, pointRadius: 4 }] },
+    options: { scales: { y: { beginAtZero: true } } }
+  });
+  document.getElementById("note-serie").textContent = d.serie.length < 2
+    ? "Une seule extraction pour l'instant : la tendance apparaîtra au fil des jours, l'Action GitHub relance la collecte chaque matin."
+    : `${d.serie.length} extractions, du ${d.serie[0].date} au ${d.serie[d.serie.length - 1].date}.`;
+
+  document.querySelector("#offres tbody").innerHTML = d.offres.map(o =>
+    `<tr><td>${o.url ? `<a href="${o.url}" target="_blank" rel="noopener">${o.intitule}</a>` : o.intitule}</td><td>${o.entreprise || "—"}</td><td>${o.lieu || "—"}</td><td>${o.contrat || "—"}</td><td>${o.salaire || "—"}</td><td>${o.date}</td></tr>`).join("");
+
+  document.getElementById("pied").innerHTML =
+    `Chaîne : API France Travail → <code>scripts/extraire.py</code> → <code>data/</code> (JSON brut + CSV, versionnés) → <code>scripts/resumer.py</code> → <code>data/resume.json</code> → cette page (GitHub Pages).
+     Une Action GitHub relance la collecte chaque matin à 7 h. Identifiants dans les secrets du dépôt, jamais dans le code.
+     Dépôt de démonstration — M2 MOD, IAE Clermont Auvergne, séminaires métiers.`;
+}).catch(e => { document.getElementById("sous").textContent = "Impossible de lire data/resume.json : " + e; });
+</script>
+</body>
+</html>

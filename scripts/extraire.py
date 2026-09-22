@@ -1,14 +1,23 @@
-r"""Récupère les offres France Travail d'un métier et les enregistre dans data/offres_<date>.csv.
+r"""Récupère les offres France Travail d'un métier et les enregistre dans data/.
 
 Usage :
-    .venv\Scripts\python.exe scripts\extraire.py                # métier du README (MOTS_CLES)
-    .venv\Scripts\python.exe scripts\extraire.py --verifier     # teste seulement la connexion
+    .venv\Scripts\python.exe scripts\extraire.py                     # requête de la veille (CODE_ROME)
+    .venv\Scripts\python.exe scripts\extraire.py --verifier          # teste seulement la connexion
+    .venv\Scripts\python.exe scripts\extraire.py --rome "" --mots "marketing digital"   # par mots plutôt que par code
     .venv\Scripts\python.exe scripts\extraire.py --departement 63
 
-Les identifiants sont lus dans le fichier .env (voir .env.example).
-API : https://francetravail.io/data/api/offres-emploi — 150 offres par appel, 1 150 par requête.
+Produit, pour chaque extraction datée :
+    data/brut/offres_<date>.json   les offres telles que l'API les renvoie (JSON complet)
+    data/offres_<date>.csv         une ligne par offre, colonnes lisibles
+    data/serie.csv                 une ligne par extraction : date, requête, total (la tendance)
+
+Les identifiants sont lus dans le fichier .env (voir .env.example) ou dans l'environnement
+(secrets GitHub Actions). API : https://francetravail.io/data/api/offres-emploi —
+150 offres par appel, 1 150 par requête, total réel dans l'en-tête Content-Range.
 """
 import argparse
+import csv
+import json
 import os
 import re
 import sys
@@ -23,8 +32,8 @@ from dotenv import load_dotenv
 RACINE = Path(__file__).resolve().parent.parent
 load_dotenv(RACINE / ".env")
 
-MOTS_CLES = "chef de projet marketing digital"
-CODE_ROME = ""          # ex. "M1705" ; vide = pas de filtre
+MOTS_CLES = ""
+CODE_ROME = "M1718"       # Chargé / Chargée de marketing digital — requête de la veille
 
 TOKEN_URL = "https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=/partenaire"
 SEARCH_URL = "https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search"
@@ -99,6 +108,8 @@ def en_tableau(offres):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--verifier", action="store_true", help="teste seulement la connexion")
+    ap.add_argument("--mots", default=MOTS_CLES, help='mots-clés ; "" pour ne pas filtrer')
+    ap.add_argument("--rome", default=CODE_ROME, help='code ROME, ex. "M1718" ; vide = pas de filtre')
     ap.add_argument("--departement", default="", help='ex. "63" ; vide = France entière')
     args = ap.parse_args()
 
@@ -107,22 +118,42 @@ def main():
     if args.verifier:
         return
 
-    params = {"motsCles": MOTS_CLES}
-    if CODE_ROME:
-        params["codeROME"] = CODE_ROME
+    params = {}
+    if args.mots:
+        params["motsCles"] = args.mots
+    if args.rome:
+        params["codeROME"] = args.rome
     if args.departement:
         params["departement"] = args.departement
+    if not params:
+        sys.exit("Il faut au moins des mots-clés ou un code ROME.")
 
     offres, total = chercher(token, params)
     df = en_tableau(offres)
-    suffixe = f"_{args.departement}" if args.departement else ""
-    sortie = RACINE / "data" / f"offres{suffixe}_{date.today():%Y-%m-%d}.csv"
+    aujourdhui = f"{date.today():%Y-%m-%d}"
+    slug_mots = re.sub(r"[^a-z0-9]+", "-", args.mots.lower()).strip("-")
+    etiquette = "_".join(filter(None, [args.rome, slug_mots, args.departement]))
+    suffixe = f"_{etiquette}" if etiquette else ""
+
+    (RACINE / "data" / "brut").mkdir(parents=True, exist_ok=True)
+    brut = RACINE / "data" / "brut" / f"offres{suffixe}_{aujourdhui}.json"
+    brut.write_text(json.dumps({"requete": params, "date": aujourdhui, "total": total,
+                                "offres": offres}, ensure_ascii=False, indent=1), encoding="utf-8")
+    sortie = RACINE / "data" / f"offres{suffixe}_{aujourdhui}.csv"
     df.to_csv(sortie, index=False, encoding="utf-8-sig")
 
-    print(f"Requête : {params} — extraction du {date.today():%d/%m/%Y}")
+    serie = RACINE / "data" / "serie.csv"
+    nouveau = not serie.exists()
+    with serie.open("a", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        if nouveau:
+            w.writerow(["date", "mots_cles", "rome", "departement", "total", "recuperees"])
+        w.writerow([aujourdhui, args.mots, args.rome, args.departement, total, len(df)])
+
+    print(f"Requête : {params} — extraction du {aujourdhui}")
     print(f"Offres annoncées par l'API : {total} ; récupérées : {len(df)}")
-    print(f"Écrit : {sortie.relative_to(RACINE)}")
-    print(df.head().to_string())
+    print(f"Écrit : {sortie.relative_to(RACINE)} et {brut.relative_to(RACINE)}")
+    print(df[["intitule", "entreprise", "lieu", "contrat", "salaire"]].head().to_string())
 
 
 if __name__ == "__main__":

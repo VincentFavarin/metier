@@ -1,0 +1,1326 @@
+{
+ "metier": "Chargé / Chargée de marketing digital",
+ "rome": "M1718",
+ "requete": {
+  "codeROME": "M1718"
+ },
+ "date": "2026-09-22",
+ "source": "France Travail — API Offres d'emploi v2",
+ "total_api": 113,
+ "recuperees": 113,
+ "puy_de_dome": 0,
+ "auvergne_rhone_alpes": 11,
+ "teletravail_mentionne": 13,
+ "salaire": {
+  "offres_affichant": 30,
+  "part_affichant": 27,
+  "min_median": 31000,
+  "max_median": 35692,
+  "min_bas": 9600,
+  "max_haut": 64000
+ },
+ "contrats": [
+  [
+   "CDD",
+   47
+  ],
+  [
+   "CDI",
+   44
+  ],
+  [
+   "LIB",
+   15
+  ],
+  [
+   "MIS",
+   7
+  ]
+ ],
+ "experience": [
+  [
+   "Débutant accepté",
+   70
+  ],
+  [
+   "3 An(s)",
+   16
+  ],
+  [
+   "2 An(s)",
+   15
+  ],
+  [
+   "1 An(s)",
+   3
+  ],
+  [
+   "8 An(s)",
+   2
+  ]
+ ],
+ "departements": [
+  [
+   "75",
+   20
+  ],
+  [
+   "92",
+   15
+  ],
+  [
+   "69",
+   8
+  ],
+  [
+   "94",
+   7
+  ],
+  [
+   "59",
+   7
+  ],
+  [
+   "13",
+   5
+  ],
+  [
+   "06",
+   5
+  ],
+  [
+   "93",
+   4
+  ],
+  [
+   "34",
+   3
+  ],
+  [
+   "35",
+   3
+  ],
+  [
+   "?",
+   3
+  ],
+  [
+   "49",
+   2
+  ]
+ ],
+ "outils": [
+  {
+   "nom": "Réseaux sociaux",
+   "offres": 33,
+   "part": 29
+  },
+  {
+   "nom": "Anglais",
+   "offres": 28,
+   "part": 25
+  },
+  {
+   "nom": "SEA / Google Ads",
+   "offres": 24,
+   "part": 21
+  },
+  {
+   "nom": "SEO",
+   "offres": 24,
+   "part": 21
+  },
+  {
+   "nom": "IA générative",
+   "offres": 21,
+   "part": 19
+  },
+  {
+   "nom": "Google Analytics",
+   "offres": 20,
+   "part": 18
+  },
+  {
+   "nom": "Emailing",
+   "offres": 18,
+   "part": 16
+  },
+  {
+   "nom": "LinkedIn",
+   "offres": 14,
+   "part": 12
+  },
+  {
+   "nom": "Suite Adobe",
+   "offres": 12,
+   "part": 11
+  },
+  {
+   "nom": "CRM",
+   "offres": 12,
+   "part": 11
+  },
+  {
+   "nom": "Marketing automation",
+   "offres": 12,
+   "part": 11
+  },
+  {
+   "nom": "Shopify / e-commerce",
+   "offres": 12,
+   "part": 11
+  },
+  {
+   "nom": "Canva",
+   "offres": 10,
+   "part": 9
+  },
+  {
+   "nom": "WordPress",
+   "offres": 10,
+   "part": 9
+  },
+  {
+   "nom": "Excel",
+   "offres": 9,
+   "part": 8
+  },
+  {
+   "nom": "Meta Ads",
+   "offres": 7,
+   "part": 6
+  },
+  {
+   "nom": "SQL / Python",
+   "offres": 7,
+   "part": 6
+  },
+  {
+   "nom": "Power BI / Looker",
+   "offres": 6,
+   "part": 5
+  },
+  {
+   "nom": "HubSpot",
+   "offres": 4,
+   "part": 4
+  }
+ ],
+ "competences": [
+  [
+   "Concevoir des supports de communication et d'image",
+   30
+  ],
+  [
+   "Optimiser la visibilité des publications sur les réseaux sociaux",
+   30
+  ],
+  [
+   "Effectuer un reporting régulier à la hiérarchie",
+   16
+  ],
+  [
+   "Analyser les besoins des utilisateurs pour la création de contenus multimédias",
+   11
+  ],
+  [
+   "Mesurer le retour sur investissement d'une action marketing",
+   11
+  ],
+  [
+   "Savoir gérer plusieurs projets ou activités simultanément",
+   11
+  ],
+  [
+   "Mettre en place des solutions d'amélioration de la performance",
+   10
+  ],
+  [
+   "Marketing des réseaux sociaux",
+   10
+  ],
+  [
+   "Concevoir des visuels pour des campagnes publicitaires",
+   10
+  ],
+  [
+   "Veille concurrentielle sur le marché digital",
+   3
+  ],
+  [
+   "Gérer les campagnes publicitaires digitales",
+   3
+  ],
+  [
+   "Assurer la gestion administrative d'une activité",
+   1
+  ]
+ ],
+ "entreprises": [
+  [
+   "(non communiquée)",
+   35
+  ],
+  [
+   "Collective.work",
+   18
+  ],
+  [
+   "EDITIONS TECHNIQUES POUR L'AUTOMOBILE ET",
+   4
+  ],
+  [
+   "ASSOCIATION IMC ALTERNANCE",
+   2
+  ],
+  [
+   "MARBLE  I",
+   2
+  ],
+  [
+   "CN FINANCE GESTION",
+   2
+  ],
+  [
+   "NOKARA",
+   1
+  ],
+  [
+   "PRECIPHAR",
+   1
+  ],
+  [
+   "SOCIETE PATISSERIE MASMOUDI FRANCE",
+   1
+  ],
+  [
+   "S.R.C.",
+   1
+  ]
+ ],
+ "serie": [
+  {
+   "date": "2026-09-22",
+   "total": 113
+  }
+ ],
+ "offres": [
+  {
+   "intitule": "Consultant Lean Digital F/H",
+   "entreprise": null,
+   "lieu": "69 - Lyon 1er Arrondissement",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-22",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7093088"
+  },
+  {
+   "intitule": "Data Analyse  Sénior - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "91 - Massy",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-22",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7092853"
+  },
+  {
+   "intitule": "FREELANCE - Consultant Web & Marketing Digital (H/F) - Freelance",
+   "entreprise": "Collective.work",
+   "lieu": "59 - Villeneuve-d'Ascq",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-22",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7092800"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "NOKARA",
+   "lieu": "13 - ARLES",
+   "contrat": "CDI",
+   "salaire": "Annuel de 28000.0 Euros à 33000.0 Euros",
+   "date": "2026-09-21",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/214FDLM"
+  },
+  {
+   "intitule": "Chef de produit marketing digital (H/F)",
+   "entreprise": "PRECIPHAR",
+   "lieu": "75 - Paris",
+   "contrat": "CDD",
+   "salaire": "Annuel de 40000.0 Euros",
+   "date": "2026-09-21",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/214DVGB"
+  },
+  {
+   "intitule": "Chargé de marketing (H/F)",
+   "entreprise": "Forums Talents Handicap",
+   "lieu": "78 - Vélizy-Villacoublay",
+   "contrat": "MIS",
+   "salaire": null,
+   "date": "2026-09-21",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7059865"
+  },
+  {
+   "intitule": "Chargé commercial & marketing digital (H/F)",
+   "entreprise": "SOCIETE PATISSERIE MASMOUDI FRANCE",
+   "lieu": "69 - LYON",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-21",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/214DRFL"
+  },
+  {
+   "intitule": "Alternance Assistant Business Development & Stratégie Digitale - Paris (F/H)",
+   "entreprise": null,
+   "lieu": "75 - Paris",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-19",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7032653"
+  },
+  {
+   "intitule": "Traffic Manager - 5J sem - Lille - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "59 - Lille",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-19",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7030362"
+  },
+  {
+   "intitule": "Consultant Data Analytics/ Data Marketing - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-19",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7030273"
+  },
+  {
+   "intitule": "Chargé(e) d'Acquisition Digital (SEA/Paid Média) - CDI // Aix-en-Provence - CDI (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "13 - Aix-en-Provence",
+   "contrat": "CDI",
+   "salaire": "Annuel de 36000.0 Euros à 39000.0 Euros",
+   "date": "2026-09-19",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/7030258"
+  },
+  {
+   "intitule": "Chargé(e) de développement commercial et communication digitale (H/F)",
+   "entreprise": "S.R.C.",
+   "lieu": "France",
+   "contrat": "CDI",
+   "salaire": "Mensuel de 1865.0 Euros",
+   "date": "2026-09-19",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/214CTPQ"
+  },
+  {
+   "intitule": "Consultant Fonctionnel Digital (H/F) - Freelance",
+   "entreprise": "Collective.work",
+   "lieu": "59 - Lille",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-18",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6985713"
+  },
+  {
+   "intitule": "Chargé, Chargée de marketing (F/H) (H/F)",
+   "entreprise": "ESSCA",
+   "lieu": "49 - Angers",
+   "contrat": "CDI",
+   "salaire": "Annuel de 35000.0 Euros à 38500.0 Euros",
+   "date": "2026-09-17",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/214BJLW"
+  },
+  {
+   "intitule": "Consultant Lean Digital F/H",
+   "entreprise": null,
+   "lieu": "01 - Valserhône",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-17",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6966796"
+  },
+  {
+   "intitule": "Conseiller Clientèle Digital Business H/F",
+   "entreprise": null,
+   "lieu": "79 - Niort",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-16",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6928591"
+  },
+  {
+   "intitule": "GROWTH MARKETER H/F (H/F)",
+   "entreprise": "JUNGHEINRICH FRANCE",
+   "lieu": "78 - Vélizy-Villacoublay",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-16",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213YBWR"
+  },
+  {
+   "intitule": "Expert Digital Workplace - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-16",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6927386"
+  },
+  {
+   "intitule": "Alternance Talent Acquisition et chargé(e) de Relations Ecoles - Paris (H/F)",
+   "entreprise": "ISCOD",
+   "lieu": "75 - Paris 15e Arrondissement",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-15",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6895789"
+  },
+  {
+   "intitule": "Head of Mobile Engineering - Permanent (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-15",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6895262"
+  },
+  {
+   "intitule": "Digital Analyst / Web Analyst - Lille - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "59 - Lille",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-15",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6895171"
+  },
+  {
+   "intitule": "Consultant Senior CRM - Marketing Automation Senior (H/F)",
+   "entreprise": "Fed Group",
+   "lieu": "92 - Issy-les-Moulineaux",
+   "contrat": "CDI",
+   "salaire": "Annuel de 50000.0 Euros à 55000.0 Euros - Package +10%",
+   "date": "2026-09-15",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6866174"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "PLEZI SOFTWARE",
+   "lieu": "34 - MONTPELLIER",
+   "contrat": "CDI",
+   "salaire": "Annuel de 32000.0 Euros à 38000.0 Euros",
+   "date": "2026-09-14",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213VQXG"
+  },
+  {
+   "intitule": "Alternant(e) Marketing & Communication Digital H/F (H/F)",
+   "entreprise": "RENAULT-DACIA",
+   "lieu": "39 - LONS LE SAUNIER",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-14",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213VPDG"
+  },
+  {
+   "intitule": "Consultant.e Data - Luxe, Retail, Hospitalité, Services - CDI H/F",
+   "entreprise": null,
+   "lieu": "92 - Nanterre",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-12",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6848568"
+  },
+  {
+   "intitule": "Alternance Business Developer & Communication (Marketing Digital & IA) H/F - Vitry-sur-Seine (F/H)",
+   "entreprise": null,
+   "lieu": "94 - Vitry-sur-Seine",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6827348"
+  },
+  {
+   "intitule": "Tech Recruiter / Talent Acquisition Partner - RPO - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6825887"
+  },
+  {
+   "intitule": "Product Owner - Échanges de Données (Fichiers & Messages) Freelance - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "92 - Châtillon",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6825697"
+  },
+  {
+   "intitule": "Digital Analyst / Web Analyst - Freelance - Région lilloise - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "59 - Roubaix",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6825452"
+  },
+  {
+   "intitule": "Software Engineer iOS H/F - Shopping App (Paris ou Lille) - Freelance",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6825445"
+  },
+  {
+   "intitule": "Business Analyst Digital Marketing & IA (F/H) - Freelance",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6825195"
+  },
+  {
+   "intitule": "Data Analyst Digital - Web Analyst (F/H) - Freelance",
+   "entreprise": "Collective.work",
+   "lieu": "34 - Montpellier",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6824998"
+  },
+  {
+   "intitule": "Campaign Manager Digital - (H/F) - Freelance",
+   "entreprise": "Collective.work",
+   "lieu": "94 - Rungis",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6824651"
+  },
+  {
+   "intitule": "Directeur / Directrice Marketing Fractional - Freelance (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "LIB",
+   "salaire": null,
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6824480"
+  },
+  {
+   "intitule": "Product Manager Média  - CDI (H/F)",
+   "entreprise": "Collective.work",
+   "lieu": "75 - Paris",
+   "contrat": "CDI",
+   "salaire": "Annuel de 54000.0 Euros à 64000.0 Euros",
+   "date": "2026-09-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6824309"
+  },
+  {
+   "intitule": "Assistant(e) Communication & Marketing Digital (H/F)",
+   "entreprise": "THE BRIDGE ECOLE ENTREPRISES",
+   "lieu": "92 - NANTERRE",
+   "contrat": "CDD",
+   "salaire": "Mensuel de 800.0 Euros à 2300.0 Euros",
+   "date": "2026-09-10",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213SCPM"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "BLIESDENTAIRE",
+   "lieu": "57 - SARREGUEMINES",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-10",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213RGGD"
+  },
+  {
+   "intitule": "CHARGE(E) D'ACQUISITION ET SUIVI CLIENT - B2B IT (H/F)",
+   "entreprise": "ZEETIM",
+   "lieu": "94 - VITRY SUR SEINE",
+   "contrat": "CDI",
+   "salaire": "Annuel de 40000.0 Euros à 50000.0 Euros",
+   "date": "2026-09-10",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213RFXS"
+  },
+  {
+   "intitule": "MEDIAPOSTE - Chargé / Chargée de marketing digital (H/F)",
+   "entreprise": "MEDIAPOSTE",
+   "lieu": "75 - Paris 14e Arrondissement",
+   "contrat": "CDD",
+   "salaire": "Annuel de 32000.0 Euros à 35000.0 Euros - + 2000€ de variable / an",
+   "date": "2026-09-09",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6775796"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": null,
+   "lieu": "28 - NOGENT LE PHAYE",
+   "contrat": "CDI",
+   "salaire": "Annuel de 30000.0 Euros à 32500.0 Euros",
+   "date": "2026-09-09",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213QTHS"
+  },
+  {
+   "intitule": "Analyste Solutions digitales Service Clients (H/F)",
+   "entreprise": "NEXTLINK FRANCE",
+   "lieu": "92 - Issy-les-Moulineaux",
+   "contrat": "CDD",
+   "salaire": "Annuel de 35000.0 Euros à 45000.0 Euros",
+   "date": "2026-09-09",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213QKXN"
+  },
+  {
+   "intitule": "#FORUMMOUGINS2026 Chargé de marketing digital  (H/F)",
+   "entreprise": "STAND TANCO & CO",
+   "lieu": "06 - MOUGINS",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-09",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213PTYT"
+  },
+  {
+   "intitule": "Chef de projet SEO et Marketing Digital H/F h/f",
+   "entreprise": null,
+   "lieu": "41 - Saint-Ouen",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6738153"
+  },
+  {
+   "intitule": "Business Consultant - Transformation Digitale & Secteur Nucléaire H/F",
+   "entreprise": null,
+   "lieu": "69 - Lyon",
+   "contrat": "MIS",
+   "salaire": null,
+   "date": "2026-09-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6728911"
+  },
+  {
+   "intitule": "Coordinateur/trice en communication et marketing digital - 16h (H/F)",
+   "entreprise": "ASS CENT VEDANT RAMAKRICHNA",
+   "lieu": "77 - GRETZ-ARMAINVILLIERS",
+   "contrat": "CDI",
+   "salaire": "Mensuel de 900.0 Euros",
+   "date": "2026-09-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213NPQQ"
+  },
+  {
+   "intitule": "Chargé / Chargée d'acquisition online (H/F)",
+   "entreprise": "MARBLE  I",
+   "lieu": "75 - Paris 11e Arrondissement",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6707431"
+  },
+  {
+   "intitule": "Chargé / Chargée d'acquisition online (H/F)",
+   "entreprise": "MARBLE  I",
+   "lieu": "75 - Paris 11e Arrondissement",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6707441"
+  },
+  {
+   "intitule": "Chef / Cheffe de projet marketing digital (H/F)",
+   "entreprise": "MIND ME AND CO",
+   "lieu": "57 - Sarreguemines",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6707413"
+  },
+  {
+   "intitule": "Web marketer (H/F)",
+   "entreprise": "CLEER",
+   "lieu": "75 - Paris 17e Arrondissement",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6707404"
+  },
+  {
+   "intitule": "Burger King France - Chef / Cheffe de projet marketing digital (H/F)",
+   "entreprise": "Burger King France",
+   "lieu": "92 - Clichy",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-07",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6697892"
+  },
+  {
+   "intitule": "CHARGE D'ACQUISITION DIGITIALE (H/F)",
+   "entreprise": "PLANET FITNESS",
+   "lieu": "13 - AIX EN PROVENCE",
+   "contrat": "CDI",
+   "salaire": "Mensuel de 2800.0 Euros à 2820.0 Euros",
+   "date": "2026-09-07",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213MTFK"
+  },
+  {
+   "intitule": "Business Analyst Digital (H/F)",
+   "entreprise": "CWF CHILDREN WORLDWIDE FASHION",
+   "lieu": "85 - LES HERBIERS",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-07",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213MPNQ"
+  },
+  {
+   "intitule": "Alternance - Chargé de Marketing Digital - Bachelor H/F",
+   "entreprise": null,
+   "lieu": "35 - Bruz",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-06",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6682640"
+  },
+  {
+   "intitule": "Alternance - Community Manager - Bachelor Marketing Digital H/F",
+   "entreprise": null,
+   "lieu": "35 - Betton",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-06",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6682593"
+  },
+  {
+   "intitule": "Alternance Chargé(e) de Marketing Digital & Acquisition - Lyon (F/H)",
+   "entreprise": null,
+   "lieu": "69 - Lyon",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-05",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6667404"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "COTE D'AZUR VILLAS",
+   "lieu": "06 - Valbonne",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-05",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6644267"
+  },
+  {
+   "intitule": "Chargé de marketing digital (H/F)",
+   "entreprise": null,
+   "lieu": "69 - Lyon 5e Arrondissement",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-05",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6639382"
+  },
+  {
+   "intitule": "Consultant Senior Capital markets & accounting advisory 26-27 (H/F)",
+   "entreprise": null,
+   "lieu": "92 - Levallois-Perret",
+   "contrat": "MIS",
+   "salaire": null,
+   "date": "2026-09-04",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6625400"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "M LACE COLLECTION",
+   "lieu": "972 - Fort-de-France",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-04",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6598654"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "GESTION ENTREPRISE CONSEIL TRANSMISSION GECT",
+   "lieu": "89 - Paron",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-04",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6598657"
+  },
+  {
+   "intitule": "Consultant/Consultante Manager Digital Finance H/F",
+   "entreprise": null,
+   "lieu": "92 - Nanterre",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-03",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6577107"
+  },
+  {
+   "intitule": "Consultant/Consultante Manager - Digital Workplace H/F",
+   "entreprise": null,
+   "lieu": "92 - Nanterre",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-03",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6577080"
+  },
+  {
+   "intitule": "Alternance Chargé de Projets Marketing digital - Paris (F/H)",
+   "entreprise": null,
+   "lieu": "75 - Paris",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-03",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6576371"
+  },
+  {
+   "intitule": "Web marketer (H/F)",
+   "entreprise": "YONIS DISTRIBUTION",
+   "lieu": "33 - Mérignac",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-03",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6539995"
+  },
+  {
+   "intitule": "Responsable acquisition digitale et growth à Paris (H/F)",
+   "entreprise": "AFEV",
+   "lieu": "75 - Paris",
+   "contrat": "CDD",
+   "salaire": "Mensuel de 2892.0 Euros à 3032.0 Euros",
+   "date": "2026-09-02",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6531897"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "EDITIONS TECHNIQUES POUR L'AUTOMOBILE ET",
+   "lieu": "94 - GENTILLY",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-02",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213GXCL"
+  },
+  {
+   "intitule": "ALTERNANT(E) EN CREATION DE CONTENU UGC I INFLUENCE I ACQUISITION (H/F)",
+   "entreprise": null,
+   "lieu": "Luxembourg",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-02",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6512105"
+  },
+  {
+   "intitule": "Spécialiste en marketing digital (H/F)",
+   "entreprise": null,
+   "lieu": "35 - Saint-Malo",
+   "contrat": "CDI",
+   "salaire": "Annuel de 28000.0 Euros à 32000.0 Euros",
+   "date": "2026-09-02",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6505988"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "LEAD & CONNECT",
+   "lieu": "69 - Saint-Genis-Laval",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-09-01",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213GCBP"
+  },
+  {
+   "intitule": "Chargé / Chargée d'acquisition online (H/F)",
+   "entreprise": "CN FINANCE GESTION",
+   "lieu": "06 - Mougins",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-09-01",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6478487"
+  },
+  {
+   "intitule": "Responsable acquisition digitale et growth (H/F)",
+   "entreprise": "ASS FONDATION ETUDIANTE POUR LA VILLE",
+   "lieu": "75 - PARIS",
+   "contrat": "CDD",
+   "salaire": "Mensuel de 2892.0 Euros à 3032.0 Euros sur 12 mois",
+   "date": "2026-08-31",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/213DRLV"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "ASTON.AI",
+   "lieu": "92 - Neuilly-sur-Seine",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-31",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6445558"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "MP NETTOYAGE",
+   "lieu": "84 - Avignon",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-31",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6445554"
+  },
+  {
+   "intitule": "Chargé / Chargée d'acquisition online (H/F)",
+   "entreprise": "CN FINANCE GESTION",
+   "lieu": "06 - Mougins",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-31",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6445528"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "TDV MEDIA",
+   "lieu": "31 - Toulouse",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-31",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6445510"
+  },
+  {
+   "intitule": "Chef / Cheffe de projet marketing digital (H/F)",
+   "entreprise": "NOMAD FORMATION",
+   "lieu": "59 - Tourcoing",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-31",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6445550"
+  },
+  {
+   "intitule": "Business Consultant - Transformation Digitale & Secteur Nucléaire H/F",
+   "entreprise": null,
+   "lieu": "92 - Courbevoie",
+   "contrat": "MIS",
+   "salaire": null,
+   "date": "2026-08-29",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6418399"
+  },
+  {
+   "intitule": "Chef de projet marketing (H/F)",
+   "entreprise": "GROUPE PEOPLE AND BABY",
+   "lieu": "75 - Paris 9e Arrondissement",
+   "contrat": "CDI",
+   "salaire": "Annuel de 35000.0 Euros à 40000.0 Euros",
+   "date": "2026-08-29",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6398590"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "MELITTA FRANCE",
+   "lieu": "93 - Saint-Denis",
+   "contrat": "CDD",
+   "salaire": "Annuel de 30000.0 Euros à 34000.0 Euros",
+   "date": "2026-08-27",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212ZWMT"
+  },
+  {
+   "intitule": "Chargé(e) de Marketing Digital (H/F)",
+   "entreprise": "ASSOCIATION IMC ALTERNANCE",
+   "lieu": "93 - ST DENIS",
+   "contrat": "CDD",
+   "salaire": "Mensuel de 800.0 Euros à 1824.0 Euros sur 12.0 mois",
+   "date": "2026-08-27",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212ZCLW"
+  },
+  {
+   "intitule": "Chargé de Marketing Digital/Réseaux Sociaux (H/F)",
+   "entreprise": null,
+   "lieu": "93 - Noisy-le-Grand",
+   "contrat": "CDI",
+   "salaire": "Mensuel de 2100.0 Euros",
+   "date": "2026-08-26",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212XYYW"
+  },
+  {
+   "intitule": "Senior Product Marketing Manager (F/H/X) (H/F)",
+   "entreprise": "EDITIONS TECHNIQUES POUR L'AUTOMOBILE ET",
+   "lieu": "94 - GENTILLY",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-08-25",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212WVFS"
+  },
+  {
+   "intitule": "Chargés de marketing digital (H/F)",
+   "entreprise": "PERFHOMME Lyon",
+   "lieu": "69 - Lyon 3e Arrondissement",
+   "contrat": "CDI",
+   "salaire": "Annuel de 30000.0 Euros à 45000.0 Euros sur 12 mois",
+   "date": "2026-08-24",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212VWGG"
+  },
+  {
+   "intitule": "Chargé(e) de marke.ng digital - Tourisme social et solidaire (H/F)",
+   "entreprise": null,
+   "lieu": "49 - ANGERS",
+   "contrat": "CDI",
+   "salaire": "Horaire de 14.5 Euros",
+   "date": "2026-08-24",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212TZML"
+  },
+  {
+   "intitule": "ALTERNANCE - Chargé de Marketing Digital & Communication F/H",
+   "entreprise": null,
+   "lieu": "59 - Lille",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-22",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6207918"
+  },
+  {
+   "intitule": "Business Consultant - Transformation Digitale H/F",
+   "entreprise": null,
+   "lieu": "92 - Courbevoie",
+   "contrat": "MIS",
+   "salaire": null,
+   "date": "2026-08-22",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6206090"
+  },
+  {
+   "intitule": "Talent Acquisition Officer H/F",
+   "entreprise": null,
+   "lieu": "50 - Cherbourg-en-Cotentin",
+   "contrat": "MIS",
+   "salaire": null,
+   "date": "2026-08-21",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/6170114"
+  },
+  {
+   "intitule": "Chargé(e) de Marketing Solutions Digitales - CDI - H/F (H/F)",
+   "entreprise": "ARCANES",
+   "lieu": "13 - Marseille 8e Arrondissement",
+   "contrat": "CDI",
+   "salaire": "Annuel de 26000.0 Euros à 29000.0 Euros sur 12.0 mois",
+   "date": "2026-08-21",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212SVDP"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "ASTEELFLASH EUROPE",
+   "lieu": "92 - Saint-Cloud",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-19",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212QXGL"
+  },
+  {
+   "intitule": "CHARGE D ACQUISITION DIGITALE MARKETPLACE H/F (H/F)",
+   "entreprise": "LEBRUN SA",
+   "lieu": "62 - ARQUES",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-08-18",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212PFYN"
+  },
+  {
+   "intitule": "Expert Growth Acquisition F/H - Nanterre - CDI h/f",
+   "entreprise": null,
+   "lieu": "92 - Nanterre",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-08-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5857224"
+  },
+  {
+   "intitule": "Web marketer (H/F)",
+   "entreprise": "TEMMOS HOTELS",
+   "lieu": "74 - Chamonix-Mont-Blanc",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-05",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5718443"
+  },
+  {
+   "intitule": "Alternance Chargé(e) de Marketing Digital & E-commerce - Paris (F/H)",
+   "entreprise": null,
+   "lieu": "75 - Paris",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-05",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5706230"
+  },
+  {
+   "intitule": "Alternance - Chargé de marketing et de communication digitale F/H",
+   "entreprise": null,
+   "lieu": "01 - Saint-Marcel",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-04",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5690951"
+  },
+  {
+   "intitule": "Apprenti(e) Responsable d'activité commerciale et MarketingH/F",
+   "entreprise": null,
+   "lieu": "34 - Béziers",
+   "contrat": "CDD",
+   "salaire": "Horaire de 12.31 Euros - % du smic selon l'âge",
+   "date": "2026-08-04",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/212BJVM"
+  },
+  {
+   "intitule": "Chef / Cheffe de projet marketing digital (H/F)",
+   "entreprise": "MSD",
+   "lieu": "971 - Basse-Terre",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-08-03",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5688028"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "ASSOCIATION IMC ALTERNANCE",
+   "lieu": "93 - Saint-Denis",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-07-28",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5503385"
+  },
+  {
+   "intitule": "Alternance Chef de projet marketing digital junior - Neuilly-sur-Seine (F/H)",
+   "entreprise": null,
+   "lieu": "92 - Neuilly-sur-Seine",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-07-25",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5463117"
+  },
+  {
+   "intitule": "Alternance Assistant gestion de projet et webmarketing - Le Bugue (F/H)",
+   "entreprise": null,
+   "lieu": "24 - Bugue",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-07-24",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5424948"
+  },
+  {
+   "intitule": "Alternance Chargé marketing, data et IA - Marseille (F/H)",
+   "entreprise": null,
+   "lieu": "13 - Marseille",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-07-24",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5424884"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "NANTES EVASION",
+   "lieu": "85 - Dompierre-sur-Yon",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-07-24",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5403894"
+  },
+  {
+   "intitule": "Alternance Chargé(e) de Communication Digitale et E-commerce - Saint-Priest (F/H)",
+   "entreprise": null,
+   "lieu": "23 - Saint-Priest",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-07-23",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5385509"
+  },
+  {
+   "intitule": "Chargé / Chargée marketing digital (H/F)",
+   "entreprise": "SECTIO-TECH",
+   "lieu": "62 - Leulinghem",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-07-21",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/5193363"
+  },
+  {
+   "intitule": "Demand Generation Manager (H/F/X) (H/F)",
+   "entreprise": "EDITIONS TECHNIQUES POUR L'AUTOMOBILE ET",
+   "lieu": "94 - GENTILLY",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-07-16",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/211HCSM"
+  },
+  {
+   "intitule": "Customer Growth & Intelligence Manager (H/F/X) (H/F)",
+   "entreprise": "EDITIONS TECHNIQUES POUR L'AUTOMOBILE ET",
+   "lieu": "94 - GENTILLY",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-07-16",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/211HCPS"
+  },
+  {
+   "intitule": "Chef de projet marketing (H/F)",
+   "entreprise": "COOPERATIVE EUREDEN",
+   "lieu": "29 - Landerneau",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-07-11",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/4828826"
+  },
+  {
+   "intitule": "ADMINISTRATEUR CRM H/F",
+   "entreprise": "EJ PICARDIE",
+   "lieu": "60 - Saint-Crépin-Ibouvillers",
+   "contrat": "CDI",
+   "salaire": "Annuel de 30000.0 Euros à 40000.0 Euros",
+   "date": "2026-07-09",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/4706918"
+  },
+  {
+   "intitule": "Chargé Marketing Digital & Communication H/F",
+   "entreprise": "Maison du Talent",
+   "lieu": "06 - Nice",
+   "contrat": "CDI",
+   "salaire": "Annuel de 35000.0 Euros à 45000.0 Euros",
+   "date": "2026-07-03",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/4526719"
+  },
+  {
+   "intitule": "COMMERCIAL TERRAIN MOBILE MONEY H/F - Guédiawaye Dakar",
+   "entreprise": null,
+   "lieu": "France",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-07-01",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/4422057"
+  },
+  {
+   "intitule": "Senior User Acquisition Manager (H/F)",
+   "entreprise": "MILLION VICTORIES",
+   "lieu": "69 - LYON",
+   "contrat": "CDI",
+   "salaire": "Annuel de 50000.0 Euros à 60000.0 Euros sur 12 mois",
+   "date": "2026-06-30",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/210MQLM"
+  },
+  {
+   "intitule": "Chef(fe) de produit marketing junior (H/F)",
+   "entreprise": "CENTRE VAL DE LOIRE EATT",
+   "lieu": "45 - CHILLEURS AUX BOIS",
+   "contrat": "MIS",
+   "salaire": "Horaire de 12.31 Euros - selon profil",
+   "date": "2026-06-03",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/209FNBG"
+  },
+  {
+   "intitule": "Head of Talent Acquisition & Development (H/F) / Leiter Talent Acquisition & Development (m/w/d)",
+   "entreprise": null,
+   "lieu": "Luxembourg",
+   "contrat": "CDI",
+   "salaire": null,
+   "date": "2026-05-08",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/2427329"
+  },
+  {
+   "intitule": "Web marketer (H/F)",
+   "entreprise": "LECLERC VOYAGES",
+   "lieu": "29 - Scaër",
+   "contrat": "CDD",
+   "salaire": null,
+   "date": "2026-04-28",
+   "url": "https://candidat.francetravail.fr/offres/recherche/detail/2026828"
+  }
+ ]
+}
