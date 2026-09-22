@@ -55,8 +55,8 @@ Au 22/09/2026 : 3 362 offres actives.
 API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl   chaque version d'annonce, une seule fois
                                             →  data/actives/<date>.csv         les offres actives du jour (rome, id)
                                             →  data/serie.csv                  par jour et par métier : total, nouvelles, modifiées
-                       scripts/resumer.py   →  data/resume.json                ce que la page affiche (+ data/geo/, cache des positions)
-                       index.html           →  https://vincentfavarin.github.io/metier/
+                       scripts/resumer.py   →  data/resume.json                ce que les pages affichent (+ data/geo/, cache des positions)
+                       index.html + 4 pages →  https://vincentfavarin.github.io/metier/
                        .github/workflows/veille.yml : GitHub relance tout ça chaque matin à 7 h
 ```
 
@@ -70,9 +70,20 @@ API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl
   (libellé texte → min/max annuels bruts), outils cités dans les descriptions
   (grille à adapter), position (lat/lon de l'API, sinon centre de la commune
   via geo.api.gouv.fr, sinon ville principale du département).
-- `index.html` — liste à cocher des métiers ; carte Leaflet (survol = l'offre,
-  clic = l'annonce sur France Travail) ; graphiques Chart.js recalculés dans le
+- Cinq pages HTML statiques, un chantier par page, toutes servies telles quelles.
+  Chacune charge `data/resume.json` et recalcule ses graphiques Chart.js dans le
   navigateur selon la sélection ; net mensuel estimé = brut × 0,78 / 12.
+  - `index.html` — les filtres, les chiffres-clés, la carte Leaflet (survol =
+    l'offre, clic = l'annonce sur France Travail), les départements, les
+    contrats, et les liens vers les quatre autres pages.
+  - `salaires.html` — ce que ça paie. `exigences.html` — ce qu'on vous demande.
+    `recruteurs.html` — qui recrute. `mouvement.html` — le marché bouge, et les
+    limites de ces chiffres (ancre `#limites`, liée depuis chaque pied de page).
+- `assets/commun.js` et `assets/commun.css` — ce que les cinq pages partagent :
+  chargement des données, panneau de filtres (mémorisé dans `localStorage`,
+  replié ailleurs que sur l'accueil), barre de navigation, utilitaires et
+  fabriques de graphiques. Une page ne contient que son HTML et son petit
+  script `rendre(offres, D)`.
 
 ## Volume et limites GitHub
 

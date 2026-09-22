@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ce que ça paie — les métiers du marketing</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="assets/commun.css">
+</head>
+<body>
+<main>
+  <div id="nav-ici"></div>
+  <h1>Ce que ça paie <small>— uniquement les offres qui affichent un salaire</small></h1>
+  <p class="sous" id="sous">Chargement des données…</p>
+
+  <div id="filtres-ici"></div>
+
+  <div class="phrase" id="phrase-salaire" style="margin-top:24px">—</div>
+  <div class="grille" style="margin-top:16px">
+    <div class="carte large"><h3>Selon le niveau de poste <small>— de la médiane des salaires minimum à celle des maximum</small></h3><div class="zone"><canvas id="g-paie-niveau"></canvas></div></div>
+    <div class="carte large"><h3>Selon le métier <small>— métiers cochés comptant au moins 8 offres avec salaire</small></h3><div class="zone haute"><canvas id="g-paie-metier"></canvas></div></div>
+    <div class="carte"><h3>Selon le type de contrat</h3><div class="zone"><canvas id="g-paie-contrat"></canvas></div></div>
+    <div class="carte"><h3>Île-de-France ou ailleurs</h3><div class="zone"><canvas id="g-paie-idf"></canvas></div></div>
+  </div>
+  <p class="note" style="margin-top:12px">Ce sont les salaires <b>affichés</b> : moins d'un tiers des annonces en donnent un, plutôt des PME et des postes juniors. Le vrai marché paie sans doute un peu mieux, surtout en haut de l'échelle. Le net mensuel est une estimation (brut × 0,78 / 12, avant impôt sur le revenu).</p>
+
+  <footer id="pied"></footer>
+</main>
+
+<script src="assets/commun.js"></script>
+<script>
+/* ============ Ce que ça paie ============ */
+function rendre(offres, D) {
+  const lib = Commun.lib, f = Commun.f;
+  const n = offres.length;
+  const avecSal = offres.filter(o => o.smin != null);
+
+  const milieux = avecSal.map(o => o.smax != null ? (o.smin + o.smax) / 2 : o.smin);
+  const q1 = quantile(milieux, .25), q3 = quantile(milieux, .75);
+  document.getElementById("phrase-salaire").innerHTML = avecSal.length < 5
+    ? (avecSal.length ? `Seulement ${avecSal.length} offre(s) de cette sélection affichent un salaire : trop peu pour en tirer quoi que ce soit.` : "Aucune offre de cette sélection n'affiche de salaire.")
+    : `Sur les <b>${avecSal.length}</b> offres qui affichent un salaire (${pct(avecSal.length, n)} % de la sélection), la moitié propose entre <b>${euro(q1, 100)}</b> et <b>${euro(q3, 100)}</b> brut par an, soit environ <b>${euro(net(q1), 10)}</b> à <b>${euro(net(q3), 10)}</b> net par mois.`;
+
+  // a) par niveau de poste
+  flottantes("g-paie-niveau", NIVEAUX.map(([k, l]) => {
+    const lot = avecSal.filter(o => niv(o) === k);
+    return { label: l, n: lot.length, paire: fourchette(lot), teinte: COUL_NIV[k] };
+  }).filter(x => x.paire && x.n >= 3));
+
+  // b) par métier (au moins 8 offres avec salaire)
+  const parMetierSal = [...f.metiers].map(code => {
+    const lot = avecSal.filter(o => o.rome === code);
+    return { label: enLignes((lib[code] && lib[code].libelle) || code, 30), n: lot.length, paire: fourchette(lot) };
+  }).filter(x => x.paire && x.n >= 8).sort((a, b) => a.paire[0] - b.paire[0]);
+  zoneSelonBarres("g-paie-metier", parMetierSal.length, 46);
+  flottantes("g-paie-metier", parMetierSal);
+
+  // c) par type de contrat et d) Île-de-France ou ailleurs
+  flottantes("g-paie-contrat", CONTRATS.map(([k, l]) => {
+    const lot = avecSal.filter(o => familleContrat(o) === k);
+    return { label: l, n: lot.length, paire: fourchette(lot) };
+  }).filter(x => x.paire && x.n >= 3));
+  // Les offres sans département (« France », « poste itinérant ») ne sont ni en Île-de-France
+  // ni ailleurs : les compter dans « reste de la France » gonflerait ce camp à tort.
+  flottantes("g-paie-idf", [
+    { label: "Île-de-France", lot: avecSal.filter(o => IDF.has(o.dep)) },
+    { label: "Reste de la France", lot: avecSal.filter(o => o.dep && !IDF.has(o.dep)) },
+  ].map(x => ({ label: x.label, n: x.lot.length, paire: fourchette(x.lot) })).filter(x => x.paire && x.n >= 3));
+}
+
+Commun.demarrer(rendre);
+</script>
+</body>
+</html>

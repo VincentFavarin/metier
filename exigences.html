@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ce qu'on vous demande — les métiers du marketing</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="assets/commun.css">
+</head>
+<body>
+<main>
+  <div id="nav-ici"></div>
+  <h1>Ce qu'on vous demande</h1>
+  <p class="sous" id="sous">Chargement des données…</p>
+
+  <div id="filtres-ici"></div>
+
+  <div class="chiffres" id="chiffres-demande" style="margin-top:24px"></div>
+  <div class="grille" style="margin-top:16px">
+    <div class="carte"><h3>Expérience demandée <small>— couleur : niveau du poste</small></h3><div class="zone"><canvas id="g-experience"></canvas></div></div>
+    <div class="carte"><h3>Formation demandée <small>— quand l'annonce la précise</small></h3><div class="zone"><canvas id="g-formation"></canvas></div></div>
+    <div class="carte large"><h3>Outils et compétences cités dans les annonces <small>— part des offres qui citent chaque outil, niveau par niveau</small></h3><div class="zone geante"><canvas id="g-outils"></canvas></div>
+      <p class="note" id="note-outils"></p></div>
+    <div class="carte large"><h3>Compétences codées par France Travail <small>— les 12 plus fréquentes</small></h3><div class="zone haute"><canvas id="g-competences"></canvas></div></div>
+  </div>
+
+  <footer id="pied"></footer>
+</main>
+
+<script src="assets/commun.js"></script>
+<script>
+/* ============ Ce qu'on vous demande ============ */
+function rendre(offres, D) {
+  const n = offres.length;
+  const debutants = offres.filter(debutantAccepte).length;
+  const expExigee = offres.filter(o => o.exp_exige === "E" && o.exp_ans != null && o.exp_ans > 0).map(o => o.exp_ans);
+  const avecForm = offres.filter(o => o.formation);
+  const bac5 = avecForm.filter(o => o.formation === "Bac+5").length;
+  const avecQuali = offres.filter(o => o.qualification);
+  const cadres = avecQuali.filter(o => /cadre/i.test(o.qualification)).length;
+  const tuiles2 = [
+    [pct(debutants, n) + " %", `acceptent un débutant (${debutants} offres)`],
+    [expExigee.length ? ans(mediane(expExigee)) : "—", `d'expérience demandée quand elle est exigée (${expExigee.length} offres)`],
+    [avecForm.length ? pct(bac5, avecForm.length) + " %" : "—", `demandent un Bac+5, parmi les ${avecForm.length} offres qui précisent une formation`],
+    [avecQuali.length ? pct(cadres, avecQuali.length) + " %" : "—", `au statut cadre, parmi les ${avecQuali.length} offres qui précisent une qualification`],
+  ];
+  document.getElementById("chiffres-demande").innerHTML = tuiles2.map(([v, l]) => `<div class="chiffre"><b>${v}</b><span>${l}</span></div>`).join("");
+
+  empilees("g-experience", EXPS, EXPS.map(t => offres.filter(o => trancheExp(o) === t)), false);
+  empilees("g-formation", FORMATIONS, FORMATIONS.map(fo => avecForm.filter(o => o.formation === fo)), false);
+
+  // Outils : une barre par outil et par niveau, en % des offres de ce niveau
+  const parNiveau = Object.fromEntries(NIVEAUX.map(([k]) => [k, offres.filter(o => niv(o) === k)]));
+  const niveauxPresents = NIVEAUX.filter(([k]) => parNiveau[k].length > 0);  // pas de série vide
+  const outils = compter(offres.flatMap(o => o.outils || []), x => x).slice(0, 15);
+  dessiner("g-outils", "bar",
+    { labels: outils.map(x => x[0]),
+      datasets: niveauxPresents.map(([k, l]) => ({
+        label: l, backgroundColor: COUL_NIV[k], borderRadius: 3,
+        data: outils.map(([nom]) => pct(parNiveau[k].filter(o => (o.outils || []).includes(nom)).length, parNiveau[k].length)),
+      })) },
+    { indexAxis: "y",
+      plugins: { legend: { display: true, position: "top", labels: { boxWidth: 12, boxHeight: 12, padding: 12 } },
+                 tooltip: { callbacks: { label: c => `${c.dataset.label} : ${c.parsed.x} % des offres de ce niveau` } } },
+      scales: { x: { beginAtZero: true, ticks: { callback: v => v + " %" } }, y: { grid: { display: true } } } });
+
+  /* Un employeur qui publie des centaines d'annonces quasi identiques (réseau de franchise,
+     agence d'intérim) déforme tous les graphiques par niveau. On le dit, avec son nom et son
+     poids réel, plutôt que de laisser lire une tendance du marché là où il n'y en a pas. */
+  // Seuil double : au moins 20 annonces ET 5 % de la sélection. Sinon, sur une sélection
+  // étroite, on désignerait un employeur qui a simplement publié six offres.
+  const gros = compter(offres, o => o.entreprise)[0];
+  document.getElementById("note-outils").textContent = (gros && gros[1] >= 20 && gros[1] >= n * 0.05)
+    ? `Un outil cité n'est pas un outil exigé — et attention : ${gros[0]} publie à elle seule ${gros[1]} des ${n} annonces de cette sélection (${pct(gros[1], n)} %), souvent le même texte répété. Décochez « Indépendant » ou « Intérim » dans les filtres pour voir ce que ça change.`
+    : "Lecture : part des offres de chaque niveau qui citent l'outil. Un outil cité n'est pas un outil exigé — il faut lire l'annonce.";
+
+  const comp = compter(offres.flatMap(o => o.competences || []), x => x).slice(0, 12);
+  zoneSelonBarres("g-competences", comp.length, 62);
+  barres("g-competences", comp.map(x => enLignes(x[0])), comp.map(x => x[1]), true, " offres");
+}
+
+Commun.demarrer(rendre);
+</script>
+</body>
+</html>

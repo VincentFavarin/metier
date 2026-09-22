@@ -1,0 +1,92 @@
+/* ============================================================
+   commun.css — le style des cinq pages.
+   Déplacé tel quel depuis l'ancien index.html, plus la barre de
+   navigation, les liens-cartes de l'accueil et le panneau de
+   filtres repliable.
+   ============================================================ */
+:root { --encre:#1d1d1f; --gris:#6e6e73; --fond:#f5f5f7; --carte:#fff; --accent:#0a5cff; --trait:#e5e5ea; }
+* { box-sizing:border-box; }
+body { margin:0; font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--encre); background:var(--fond); }
+main { max-width:1120px; margin:0 auto; padding:32px 16px 64px; }
+h1 { font-size:1.9rem; margin:0 0 4px; }
+h1 small { font-weight:400; color:var(--gris); font-size:.6em; }
+h2 { font-size:1.15rem; margin:40px 0 12px; }
+h2 small { font-weight:400; color:var(--gris); font-size:.85rem; }
+.sous { color:var(--gris); margin:0 0 20px; }
+.chiffres { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(240px,100%), 1fr)); gap:12px; }
+.chiffre { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:14px 16px; }
+.chiffre b { display:block; font-size:1.8rem; line-height:1.1; color:var(--accent); }
+.chiffre span { color:var(--gris); font-size:.85rem; }
+.grille { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(420px,100%), 1fr)); gap:16px; }
+.carte { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; }
+.carte h3 { margin:0 0 8px; font-size:1rem; }
+.carte h3 small { font-weight:400; color:var(--gris); }
+.large { grid-column:1 / -1; }
+/* Chaque graphique vit dans une zone de hauteur fixe : lisible et prévisible, y compris sur mobile. */
+.zone { position:relative; height:320px; }
+.zone.haute { height:500px; }
+.zone.geante { height:880px; }
+#map { height:600px; border-radius:8px; }
+.carte-outils { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:0 0 10px; }
+.carte-outils button { font:inherit; font-size:.85rem; padding:4px 12px; border:1px solid var(--trait); border-radius:8px; background:var(--carte); cursor:pointer; }
+.carte-outils button:hover, .carte-outils button.actif { border-color:var(--accent); color:var(--accent); }
+.carte-outils .legende { margin-left:auto; font-size:.85rem; color:var(--gris); display:flex; gap:12px; flex-wrap:wrap; }
+.legende i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; vertical-align:middle; }
+.grappe { background:rgba(10,92,255,.85); color:#fff; border:2px solid #fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font:600 12px system-ui, sans-serif; box-shadow:0 1px 4px rgba(0,0,0,.3); }
+.grappe.moyenne { font-size:13px; } .grappe.grande { font-size:14px; }
+/* Filtres : trois blocs, une seule carte */
+.filtres { display:grid; grid-template-columns:1.7fr 1fr 1fr; gap:24px; align-items:start; }
+.filtres h3 { margin:0 0 8px; font-size:.85rem; text-transform:uppercase; letter-spacing:.04em; color:var(--gris); }
+.metiers { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(280px,100%), 1fr)); gap:4px 24px; }
+.metiers h4 { grid-column:1 / -1; margin:10px 0 2px; font-size:.85rem; text-transform:uppercase; letter-spacing:.04em; color:var(--gris); }
+.cases label, .metiers label { display:flex; align-items:center; gap:8px; font-size:.95rem; cursor:pointer; padding:1px 0; }
+.cases label input, .metiers label input { accent-color:var(--accent); flex:none; }
+.cases label small, .metiers label small { color:var(--gris); margin-left:auto; padding-left:8px; }
+.pastille { width:11px; height:11px; border-radius:3px; display:inline-block; flex:none; }
+.boutons { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.boutons button { font:inherit; font-size:.85rem; padding:4px 12px; border:1px solid var(--trait); border-radius:8px; background:var(--carte); cursor:pointer; }
+.boutons button:hover { border-color:var(--accent); color:var(--accent); }
+.groupes { display:flex; gap:14px; align-items:center; margin-left:8px; font-size:.9rem; flex-wrap:wrap; }
+.groupes label { display:flex; align-items:center; gap:5px; cursor:pointer; }
+.compte { margin:12px 0 0; font-size:.95rem; color:var(--gris); }
+.compte b { color:var(--encre); }
+.vide { background:#fff6e5; border:1px solid #f0d9a8; border-radius:12px; padding:12px 16px; margin:16px 0 0; font-size:.95rem; }
+.phrase { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:18px 20px; font-size:1.05rem; line-height:1.55; }
+.phrase b { color:var(--accent); white-space:nowrap; }
+/* Liste compacte des dernières offres */
+.liste { display:grid; gap:8px; }
+.item { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:10px 14px; }
+.item .titre { font-weight:600; }
+.item .meta { color:var(--gris); font-size:.88rem; margin-top:2px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.etiq { display:inline-block; font-size:.74rem; line-height:1.6; padding:0 9px; border-radius:99px; color:#fff; }
+.sal { color:#137333; font-weight:600; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.note { color:var(--gris); font-size:.9rem; }
+.leaflet-popup-content { font:13px/1.4 system-ui, sans-serif; margin:10px 12px; }
+.leaflet-popup-content b { display:block; font-size:14px; margin-bottom:2px; }
+footer { margin-top:48px; color:var(--gris); font-size:.85rem; border-top:1px solid var(--trait); padding-top:16px; }
+
+/* ---- Barre de navigation, commune aux cinq pages ---- */
+.nav { display:flex; gap:4px; flex-wrap:wrap; margin:0 0 18px; }
+.nav a { padding:6px 12px; border-radius:99px; font-size:.92rem; color:var(--gris); border:1px solid transparent; }
+.nav a:hover { background:var(--carte); text-decoration:none; }
+.nav a.ici { background:var(--carte); border-color:var(--trait); color:var(--encre); font-weight:600; }
+
+/* ---- Panneau de filtres replié (toutes les pages sauf l'accueil) ---- */
+details.carte > summary { cursor:pointer; font-weight:600; font-size:.95rem; list-style:none; display:flex; align-items:center; gap:8px; }
+details.carte > summary::-webkit-details-marker { display:none; }
+details.carte > summary::before { content:"\25B8"; color:var(--accent); }
+details.carte[open] > summary::before { content:"\25BE"; }
+details.carte[open] > summary { margin-bottom:14px; }
+
+/* ---- Liens-cartes de l'accueil vers les quatre autres pages ---- */
+.liens { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(260px,100%), 1fr)); gap:12px; }
+a.lien { display:block; background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; color:var(--encre); }
+a.lien:hover { border-color:var(--accent); text-decoration:none; }
+a.lien b { display:block; font-size:1.05rem; margin-bottom:4px; }
+a.lien span { color:var(--gris); font-size:.9rem; }
+a.lien span i { font-style:normal; color:var(--accent); font-weight:600; }
+
+@media (max-width:880px) { .filtres { grid-template-columns:1fr; } }
+@media (max-width:480px) { main { padding:20px 12px 48px; } h1 { font-size:1.45rem; } #map { height:420px; } }
