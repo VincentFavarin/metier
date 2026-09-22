@@ -1,0 +1,5 @@
+# Identifiants : jamais versionnés
+.env
+# Environnement Python
+.venv/
+__pycache__/
