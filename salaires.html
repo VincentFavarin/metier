@@ -20,7 +20,7 @@
     <div class="carte large"><h3>Selon le niveau de poste <small>— de la médiane des salaires minimum à celle des maximum</small></h3><div class="zone"><canvas id="g-paie-niveau"></canvas></div></div>
     <div class="carte large"><h3>Selon le métier <small>— métiers cochés comptant au moins 8 offres avec salaire</small></h3><div class="zone haute"><canvas id="g-paie-metier"></canvas></div></div>
     <div class="carte"><h3>Selon le type de contrat</h3><div class="zone"><canvas id="g-paie-contrat"></canvas></div></div>
-    <div class="carte"><h3>Île-de-France ou ailleurs</h3><div class="zone"><canvas id="g-paie-idf"></canvas></div></div>
+    <div class="carte"><h3>Selon le territoire — le Puy-de-Dôme, l'Île-de-France, le reste</h3><div class="zone"><canvas id="g-paie-idf"></canvas></div></div>
   </div>
   <p class="note" style="margin-top:12px">Ce sont les salaires <b>affichés</b> : moins d'un tiers des annonces en donnent un, plutôt des PME et des postes juniors. Le vrai marché paie sans doute un peu mieux, surtout en haut de l'échelle. Le net mensuel est une estimation (brut × 0,78 / 12, avant impôt sur le revenu).</p>
 
@@ -60,11 +60,13 @@ function rendre(offres, D) {
     const lot = avecSal.filter(o => familleContrat(o) === k);
     return { label: l, n: lot.length, paire: fourchette(lot) };
   }).filter(x => x.paire && x.n >= 3));
-  // Les offres sans département (« France », « poste itinérant ») ne sont ni en Île-de-France
-  // ni ailleurs : les compter dans « reste de la France » gonflerait ce camp à tort.
+  // Trois territoires qui ne se recouvrent pas : le Puy-de-Dôme, l'Île-de-France, et tout le reste
+  // (le 63 est donc retiré du reste). Les offres sans département (« France », « poste itinérant »)
+  // ne sont dans aucun des trois : les compter ailleurs gonflerait ce camp à tort.
   flottantes("g-paie-idf", [
+    { label: "Puy-de-Dôme", lot: avecSal.filter(o => o.dep === "63") },
     { label: "Île-de-France", lot: avecSal.filter(o => IDF.has(o.dep)) },
-    { label: "Reste de la France", lot: avecSal.filter(o => o.dep && !IDF.has(o.dep)) },
+    { label: "Reste de la France", lot: avecSal.filter(o => o.dep && o.dep !== "63" && !IDF.has(o.dep)) },
   ].map(x => ({ label: x.label, n: x.lot.length, paire: fourchette(x.lot) })).filter(x => x.paire && x.n >= 3));
 }
 
