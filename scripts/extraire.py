@@ -67,6 +67,15 @@ def chercher(token, params, pas=150, maximum=1150):
     return offres, total
 
 
+def departement(lieu):
+    """Code département : depuis le code postal, sinon depuis le libellé du type '75 - Paris'."""
+    cp = lieu.get("codePostal") or ""
+    if cp[:2].isdigit():
+        return cp[:2]
+    m = re.match(r"\s*(\d{2})\s*-", lieu.get("libelle") or "")
+    return m.group(1) if m else ""
+
+
 def en_tableau(offres):
     lignes = []
     for o in offres:
@@ -75,7 +84,7 @@ def en_tableau(offres):
             "intitule": o.get("intitule"),
             "entreprise": (o.get("entreprise") or {}).get("nom"),
             "lieu": (o.get("lieuTravail") or {}).get("libelle"),
-            "departement": ((o.get("lieuTravail") or {}).get("codePostal") or "")[:2],
+            "departement": departement(o.get("lieuTravail") or {}),
             "contrat": o.get("typeContrat"),
             "experience": o.get("experienceLibelle"),
             "salaire": (o.get("salaire") or {}).get("libelle"),
