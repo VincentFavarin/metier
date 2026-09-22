@@ -166,12 +166,19 @@ function empilees(id, etiquettes, offresParEtiquette, horizontal = false) {
     label: lib, backgroundColor: COUL_NIV[k], borderRadius: 3,
     data: etiquettes.map((_, i) => (offresParEtiquette[i] || []).filter(o => niv(o) === k).length),
   })).filter(d => d.data.some(v => v > 0));
+  // Total de chaque barre, pour dire dans l'infobulle « 320 offres sur 900, soit 36 % ».
+  const totaux = etiquettes.map((_, i) => datasets.reduce((s, d) => s + d.data[i], 0));
   dessiner(id, "bar", { labels: etiquettes, datasets },
     { indexAxis: horizontal ? "y" : "x",
       plugins: { legend: { display: true, position: "bottom", labels: { boxWidth: 12, boxHeight: 12, padding: 12 } },
-                 tooltip: { callbacks: { label: c => `${c.dataset.label} : ${c.parsed[horizontal ? "x" : "y"]}` } } },
-      scales: { x: { stacked: true, beginAtZero: true, grid: { display: !horizontal } },
-                y: { stacked: true, beginAtZero: true, grid: { display: horizontal }, ticks: { autoSkip: !horizontal } } } });
+                 tooltip: { callbacks: {
+                   title: c => `${c[0].label} — ${totaux[c[0].dataIndex]} offres`,
+                   label: c => { const v = c.parsed[horizontal ? "x" : "y"], t = totaux[c.dataIndex];
+                     return `${c.dataset.label} : ${v} offre${v > 1 ? "s" : ""}${t ? ` (${Math.round(100 * v / t)} % de la barre)` : ""}`; } } } },
+      scales: { x: { stacked: true, beginAtZero: true, grid: { display: !horizontal },
+                     title: horizontal ? { display: true, text: "nombre d'offres" } : undefined },
+                y: { stacked: true, beginAtZero: true, grid: { display: horizontal }, ticks: { autoSkip: !horizontal },
+                     title: horizontal ? undefined : { display: true, text: "nombre d'offres" } } } });
 }
 
 /* Barres flottantes : de la médiane des minima à la médiane des maxima. */

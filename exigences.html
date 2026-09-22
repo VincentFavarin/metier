@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ce qu'on vous demande — les métiers du marketing</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="assets/commun.css">
+<link rel="stylesheet" href="assets/commun.css?v=3">
 </head>
 <body>
 <main>
@@ -17,17 +17,17 @@
 
   <div class="chiffres" id="chiffres-demande" style="margin-top:24px"></div>
   <div class="grille" style="margin-top:16px">
-    <div class="carte"><h3>Expérience demandée <small>— couleur : niveau du poste</small></h3><div class="zone"><canvas id="g-experience"></canvas></div></div>
-    <div class="carte"><h3>Formation demandée <small>— quand l'annonce la précise</small></h3><div class="zone"><canvas id="g-formation"></canvas></div></div>
-    <div class="carte large"><h3>Outils et compétences cités dans les annonces <small>— part des offres qui citent chaque outil, niveau par niveau</small></h3><div class="zone geante"><canvas id="g-outils"></canvas></div>
+    <div class="carte"><h3>Combien d'expérience faut-il ? <small>— chaque barre est découpée par niveau de poste : la couleur dit qui est concerné</small></h3><div class="zone"><canvas id="g-experience"></canvas></div></div>
+    <div class="carte"><h3>Quel diplôme demande-t-on ? <small id="sous-formation">— seules les offres qui le précisent, découpées par niveau de poste</small></h3><div class="zone"><canvas id="g-formation"></canvas></div></div>
+    <div class="carte large"><h3>Quels outils faut-il savoir utiliser ? <small>— sur 100 offres d'un même niveau de poste, combien citent l'outil ; une barre par niveau</small></h3><div class="zone geante"><canvas id="g-outils"></canvas></div>
       <p class="note" id="note-outils"></p></div>
-    <div class="carte large"><h3>Compétences codées par France Travail <small>— les 12 plus fréquentes</small></h3><div class="zone haute"><canvas id="g-competences"></canvas></div></div>
+    <div class="carte large"><h3>Les compétences que France Travail associe à ces offres <small>— les 12 plus fréquentes ; c'est le codage officiel de l'annonce, pas nos mots-clés</small></h3><div class="zone haute"><canvas id="g-competences"></canvas></div></div>
   </div>
 
   <footer id="pied"></footer>
 </main>
 
-<script src="assets/commun.js"></script>
+<script src="assets/commun.js?v=3"></script>
 <script>
 /* ============ Ce qu'on vous demande ============ */
 function rendre(offres, D) {
@@ -48,6 +48,10 @@ function rendre(offres, D) {
 
   empilees("g-experience", EXPS, EXPS.map(t => offres.filter(o => trancheExp(o) === t)), false);
   empilees("g-formation", FORMATIONS, FORMATIONS.map(fo => avecForm.filter(o => o.formation === fo)), false);
+  // Le champ « formation » est rare : on affiche sur combien d'offres ce graphique est construit,
+  // sinon on lit une exigence de diplôme du marché là où il n'y a qu'une poignée d'annonces.
+  document.getElementById("sous-formation").textContent =
+    `— sur les ${avecForm.length} offres qui le précisent (${pct(avecForm.length, n)} % de la sélection), découpées par niveau de poste`;
 
   // Outils : une barre par outil et par niveau, en % des offres de ce niveau
   const parNiveau = Object.fromEntries(NIVEAUX.map(([k]) => [k, offres.filter(o => niv(o) === k)]));
