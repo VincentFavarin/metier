@@ -42,6 +42,8 @@
   .boutons { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
   .boutons button { font:inherit; font-size:.85rem; padding:4px 12px; border:1px solid var(--trait); border-radius:8px; background:var(--carte); cursor:pointer; }
   .boutons button:hover { border-color:var(--accent); color:var(--accent); }
+  .groupes { display:flex; gap:14px; align-items:center; margin-left:8px; font-size:.9rem; }
+  .groupes label { display:flex; align-items:center; gap:5px; cursor:pointer; }
   table { width:100%; border-collapse:collapse; font-size:.9rem; background:var(--carte); border:1px solid var(--trait); border-radius:12px; overflow:hidden; }
   th, td { text-align:left; padding:8px 10px; border-top:1px solid var(--trait); vertical-align:top; }
   th { background:var(--fond); border-top:0; font-weight:600; }
@@ -63,9 +65,7 @@
     <div class="boutons">
       <button data-groupe="tous">Tout cocher</button>
       <button data-groupe="aucun">Tout décocher</button>
-      <button data-groupe="Marketing">Cœur marketing</button>
-      <button data-groupe="Digital">Digital</button>
-      <button data-groupe="Frontière">Frontière</button>
+      <span class="groupes" id="groupes"></span>
     </div>
   </div>
 
@@ -227,12 +227,24 @@ fetch("data/resume.json", { cache: "no-cache" }).then(r => r.json()).then(d => {
   document.getElementById("metiers").innerHTML = groupes.map(g => `<h4 style="color:${COULEURS[g] || ""}">${g}</h4>` +
     d.metiers.filter(m => m.groupe === g).map(m =>
       `<label><input type="checkbox" value="${m.code}" data-groupe="${m.groupe}" ${(memo ? memo.includes(m.code) : m.coche) ? "checked" : ""}> ${m.libelle} <small>${m.code} · ${m.actives}</small></label>`).join("")).join("");
-  document.getElementById("metiers").addEventListener("change", rendre);
-  document.querySelectorAll(".boutons button").forEach(b => b.addEventListener("click", () => {
-    const g = b.dataset.groupe;
-    document.querySelectorAll("#metiers input").forEach(i => { i.checked = g === "tous" ? true : g === "aucun" ? false : i.dataset.groupe === g; });
-    rendre();
+  // Une case par groupe : cocher/décocher le groupe entier, cumulables ; état intermédiaire si le groupe est partiel.
+  document.getElementById("groupes").innerHTML = groupes.map(g =>
+    `<label style="color:${COULEURS[g] || ""}"><input type="checkbox" data-groupe-case="${g}"> ${g}</label>`).join("");
+  const majGroupes = () => document.querySelectorAll("[data-groupe-case]").forEach(c => {
+    const cases = [...document.querySelectorAll(`#metiers input[data-groupe="${c.dataset.groupeCase}"]`)];
+    const n = cases.filter(i => i.checked).length;
+    c.checked = n === cases.length; c.indeterminate = n > 0 && n < cases.length;
+  });
+  document.querySelectorAll("[data-groupe-case]").forEach(c => c.addEventListener("change", () => {
+    document.querySelectorAll(`#metiers input[data-groupe="${c.dataset.groupeCase}"]`).forEach(i => { i.checked = c.checked; });
+    majGroupes(); rendre();
   }));
+  document.getElementById("metiers").addEventListener("change", () => { majGroupes(); rendre(); });
+  document.querySelectorAll(".boutons button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("#metiers input").forEach(i => { i.checked = b.dataset.groupe === "tous"; });
+    majGroupes(); rendre();
+  }));
+  majGroupes();
 
   const VUES = { france: [[46.4, 2.4], 6], clermont: [[45.78, 3.09], 11], aura: [[45.5, 4.6], 8], paris: [[48.8, 2.4], 10] };
   const FONDS = {
