@@ -6,6 +6,8 @@
 <title>Les métiers du marketing — le marché, lu dans les offres</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css">
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.min.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root { --encre:#1d1d1f; --gris:#6e6e73; --fond:#f5f5f7; --carte:#fff; --accent:#0a5cff; --trait:#e5e5ea; }
@@ -24,7 +26,14 @@
   .carte h3 { margin:0 0 8px; font-size:1rem; }
   .large { grid-column:1 / -1; }
   canvas { max-height:340px; }
-  #map { height:560px; border-radius:8px; }
+  #map { height:600px; border-radius:8px; }
+  .carte-outils { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:0 0 10px; }
+  .carte-outils button { font:inherit; font-size:.85rem; padding:4px 12px; border:1px solid var(--trait); border-radius:8px; background:var(--carte); cursor:pointer; }
+  .carte-outils button:hover, .carte-outils button.actif { border-color:var(--accent); color:var(--accent); }
+  .carte-outils .legende { margin-left:auto; font-size:.85rem; color:var(--gris); display:flex; gap:12px; }
+  .legende i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; vertical-align:middle; }
+  .grappe { background:rgba(10,92,255,.85); color:#fff; border:2px solid #fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font:600 12px system-ui, sans-serif; box-shadow:0 1px 4px rgba(0,0,0,.3); }
+  .grappe.moyenne { font-size:13px; } .grappe.grande { font-size:14px; }
   .metiers { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:4px 24px; }
   .metiers h4 { grid-column:1 / -1; margin:10px 0 2px; font-size:.85rem; text-transform:uppercase; letter-spacing:.04em; color:var(--gris); }
   .metiers label { display:flex; align-items:center; gap:8px; font-size:.95rem; cursor:pointer; }
@@ -65,6 +74,15 @@
 
   <h2>Où sont les offres</h2>
   <div class="carte large"><h3>Chaque point est une offre — survolez pour la lire, cliquez pour l'ouvrir</h3>
+    <div class="carte-outils">
+      <button data-vue="france">France</button>
+      <button data-vue="clermont">Clermont</button>
+      <button data-vue="aura">Auvergne-Rhône-Alpes</button>
+      <button data-vue="paris">Île-de-France</button>
+      <button data-fond="gris" class="actif">Fond gris</button>
+      <button data-fond="osm">Fond OpenStreetMap</button>
+      <span class="legende"><span><i style="background:#0a5cff"></i>cœur marketing</span><span><i style="background:#ff6a00"></i>digital</span><span><i style="background:#8e8e93"></i>frontière</span></span>
+    </div>
     <div id="map"></div>
     <p class="note" id="note-carte"></p></div>
   <div class="grille" style="margin-top:16px">
@@ -153,14 +171,15 @@ function rendre() {
     if (o.lat == null) continue;
     places++;
     const g = lib[o.rome]?.groupe;
-    const m = L.circleMarker([o.lat, o.lon], { radius: o.prec === "offre" ? 5 : 4, color: COULEURS[g] || couleur, weight: 1, fillOpacity: o.prec === "departement" ? .25 : .6 });
+    const m = L.circleMarker([o.lat, o.lon], { radius: 6, color: "#fff", weight: 1, fillColor: COULEURS[g] || couleur, fillOpacity: o.prec === "departement" ? .45 : .9 });
     m.bindPopup(`<b>${o.intitule}</b>${o.entreprise || "—"} · ${o.lieu || ""}<br>${o.contrat || ""}${o.salaire ? " · " + o.salaire : ""}<br><span style="color:#888">${lib[o.rome]?.libelle || o.rome}${o.prec !== "offre" ? " · position : " + o.prec : ""}</span>`, { closeButton: false });
     m.on("mouseover", function () { this.openPopup(); });
+    m.on("mouseout", function () { this.closePopup(); });
     if (o.url) m.on("click", () => window.open(o.url, "_blank", "noopener"));
     calque.addLayer(m);
   }
   document.getElementById("note-carte").textContent =
-    `${places} offres placées (${n - places} sans lieu précis : « France », « Île-de-France »…). Bleu : cœur marketing, orange : digital, gris : frontière. Point pâle : placé au centre du département.`;
+    `${places} offres placées, ${n - places} sans lieu précis (« France », « Île-de-France »…). Les chiffres sont des grappes : cliquez pour zoomer, molette ou boutons pour naviguer. Point pâle : placé au centre du département.`;
 
   // Graphiques
   const deps = compter(offres, o => o.dep || null).slice(0, 15);
@@ -215,9 +234,24 @@ fetch("data/resume.json", { cache: "no-cache" }).then(r => r.json()).then(d => {
     rendre();
   }));
 
-  carte = L.map("map", { scrollWheelZoom: false }).setView([46.6, 2.4], 6);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap, &copy; CARTO" }).addTo(carte);
-  calque = L.layerGroup().addTo(carte);
+  const VUES = { france: [[46.4, 2.4], 6], clermont: [[45.78, 3.09], 11], aura: [[45.5, 4.6], 8], paris: [[48.8, 2.4], 10] };
+  const FONDS = {
+    gris: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, attribution: "Tiles &copy; Esri, HERE, Garmin, OpenStreetMap" }),
+    osm: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" }),
+  };
+  carte = L.map("map", { scrollWheelZoom: true, zoomSnap: .5, zoomControl: true }).setView(...VUES.france);
+  FONDS.gris.addTo(carte);
+  // Grappes : un chiffre par zone tant qu'on est loin, les points individuels dès qu'on zoome.
+  calque = L.markerClusterGroup({
+    maxClusterRadius: 45, disableClusteringAtZoom: 12, spiderfyOnMaxZoom: true, showCoverageOnHover: false, chunkedLoading: true,
+    iconCreateFunction: c => { const n = c.getChildCount(), t = n < 10 ? "petite" : n < 100 ? "moyenne" : "grande", d = n < 10 ? 28 : n < 100 ? 36 : 46;
+      return L.divIcon({ html: `<div class="grappe ${t}" style="width:${d}px;height:${d}px">${n}</div>`, className: "", iconSize: [d, d] }); }
+  }).addTo(carte);
+  document.querySelectorAll("[data-vue]").forEach(b => b.addEventListener("click", () => carte.flyTo(...VUES[b.dataset.vue])));
+  document.querySelectorAll("[data-fond]").forEach(b => b.addEventListener("click", () => {
+    Object.values(FONDS).forEach(f => carte.removeLayer(f)); FONDS[b.dataset.fond].addTo(carte);
+    document.querySelectorAll("[data-fond]").forEach(x => x.classList.toggle("actif", x === b));
+  }));
 
   document.getElementById("pied").innerHTML =
     `Chaîne : API France Travail → <code>scripts/extraire.py</code> → <code>data/brut/</code> (chaque version d'annonce, une seule fois) + <code>data/actives/</code> (les offres du jour) → <code>scripts/resumer.py</code> → <code>data/resume.json</code> → cette page (GitHub Pages).
