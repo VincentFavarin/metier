@@ -195,7 +195,9 @@ function rendre() {
   try { localStorage.setItem("metiers-coches", JSON.stringify([...sel])); } catch (e) {}
 }
 
-fetch("data/resume.json").then(r => r.json()).then(d => {
+// GitHub Pages met le JSON en cache 10 minutes : on le redemande frais à chaque chargement.
+fetch("data/resume.json", { cache: "no-cache" }).then(r => r.json()).then(d => {
+  if (!d.metiers) throw new Error("ancien format de resume.json — rechargez la page (Ctrl+F5)");
   D = d;
   document.getElementById("sous").innerHTML =
     `${d.source} · ${d.requete} · extraction du <b>${d.date}</b> · ${d.offres.length} offres actives, ${d.versions_conservees} versions d'annonces conservées`;
