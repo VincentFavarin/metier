@@ -3,41 +3,71 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chargé de marketing digital — le marché, lu dans les offres</title>
+<title>Les métiers du marketing — le marché, lu dans les offres</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root { --encre:#1d1d1f; --gris:#6e6e73; --fond:#f5f5f7; --carte:#fff; --accent:#0a5cff; --trait:#e5e5ea; }
   * { box-sizing:border-box; }
   body { margin:0; font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--encre); background:var(--fond); }
-  main { max-width:1080px; margin:0 auto; padding:32px 16px 64px; }
+  main { max-width:1120px; margin:0 auto; padding:32px 16px 64px; }
   h1 { font-size:1.9rem; margin:0 0 4px; }
   h2 { font-size:1.15rem; margin:40px 0 12px; }
-  .sous { color:var(--gris); margin:0 0 24px; }
-  .chiffres { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:12px; }
-  .chiffre { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; }
-  .chiffre b { display:block; font-size:2rem; line-height:1.1; color:var(--accent); }
-  .chiffre span { color:var(--gris); font-size:.9rem; }
+  .sous { color:var(--gris); margin:0 0 20px; }
+  .chiffres { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; }
+  .chiffre { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:14px 16px; }
+  .chiffre b { display:block; font-size:1.8rem; line-height:1.1; color:var(--accent); }
+  .chiffre span { color:var(--gris); font-size:.85rem; }
   .grille { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; }
   .carte { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; }
   .carte h3 { margin:0 0 8px; font-size:1rem; }
-  canvas { max-height:320px; }
+  .large { grid-column:1 / -1; }
+  canvas { max-height:340px; }
+  #map { height:560px; border-radius:8px; }
+  .metiers { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:4px 24px; }
+  .metiers h4 { grid-column:1 / -1; margin:10px 0 2px; font-size:.85rem; text-transform:uppercase; letter-spacing:.04em; color:var(--gris); }
+  .metiers label { display:flex; align-items:center; gap:8px; font-size:.95rem; cursor:pointer; }
+  .metiers label input { accent-color:var(--accent); }
+  .metiers label small { color:var(--gris); margin-left:auto; }
+  .boutons { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+  .boutons button { font:inherit; font-size:.85rem; padding:4px 12px; border:1px solid var(--trait); border-radius:8px; background:var(--carte); cursor:pointer; }
+  .boutons button:hover { border-color:var(--accent); color:var(--accent); }
   table { width:100%; border-collapse:collapse; font-size:.9rem; background:var(--carte); border:1px solid var(--trait); border-radius:12px; overflow:hidden; }
   th, td { text-align:left; padding:8px 10px; border-top:1px solid var(--trait); vertical-align:top; }
   th { background:var(--fond); border-top:0; font-weight:600; }
   a { color:var(--accent); text-decoration:none; }
   .note { color:var(--gris); font-size:.9rem; }
+  .leaflet-popup-content { font:13px/1.4 system-ui, sans-serif; margin:10px 12px; }
+  .leaflet-popup-content b { display:block; font-size:14px; margin-bottom:2px; }
   footer { margin-top:48px; color:var(--gris); font-size:.85rem; border-top:1px solid var(--trait); padding-top:16px; }
 </style>
 </head>
 <body>
 <main>
-  <h1 id="titre">Chargé / Chargée de marketing digital</h1>
+  <h1>Les métiers du marketing — le marché, lu dans les offres</h1>
   <p class="sous" id="sous">Chargement des données…</p>
 
+  <div class="carte">
+    <h3>Les métiers affichés <small class="note" id="nb-coches"></small></h3>
+    <div class="metiers" id="metiers"></div>
+    <div class="boutons">
+      <button data-groupe="tous">Tout cocher</button>
+      <button data-groupe="aucun">Tout décocher</button>
+      <button data-groupe="Marketing">Cœur marketing</button>
+      <button data-groupe="Digital">Digital</button>
+      <button data-groupe="Frontière">Frontière</button>
+    </div>
+  </div>
+
+  <h2>En chiffres</h2>
   <div class="chiffres" id="chiffres"></div>
 
   <h2>Où sont les offres</h2>
-  <div class="grille">
+  <div class="carte large"><h3>Chaque point est une offre — survolez pour la lire, cliquez pour l'ouvrir</h3>
+    <div id="map"></div>
+    <p class="note" id="note-carte"></p></div>
+  <div class="grille" style="margin-top:16px">
     <div class="carte"><h3>Par département</h3><canvas id="g-departements"></canvas></div>
     <div class="carte"><h3>Par type de contrat</h3><canvas id="g-contrats"></canvas></div>
   </div>
@@ -45,82 +75,153 @@
   <h2>Ce que les annonces demandent</h2>
   <div class="grille">
     <div class="carte"><h3>Outils et compétences cités (% des offres)</h3><canvas id="g-outils"></canvas></div>
-    <div class="carte"><h3>Compétences codées par France Travail</h3><canvas id="g-competences"></canvas></div>
+    <div class="carte"><h3>Expérience demandée</h3><canvas id="g-experience"></canvas></div>
+    <div class="carte large"><h3>Compétences codées par France Travail</h3><canvas id="g-competences"></canvas></div>
   </div>
 
   <h2>Le marché bouge</h2>
   <div class="grille">
-    <div class="carte"><h3>Nombre d'offres à chaque extraction</h3><canvas id="g-serie"></canvas>
+    <div class="carte"><h3>Offres actives à chaque extraction</h3><canvas id="g-serie"></canvas>
       <p class="note" id="note-serie"></p></div>
     <div class="carte"><h3>Entreprises qui publient le plus</h3><canvas id="g-entreprises"></canvas></div>
   </div>
 
-  <h2>Les offres du jour</h2>
-  <table id="offres"><thead><tr><th>Intitulé</th><th>Entreprise</th><th>Lieu</th><th>Contrat</th><th>Salaire affiché</th><th>Publiée</th></tr></thead><tbody></tbody></table>
+  <h2>Les offres du jour <small class="note" id="nb-offres"></small></h2>
+  <table id="offres"><thead><tr><th>Intitulé</th><th>Métier (ROME)</th><th>Entreprise</th><th>Lieu</th><th>Contrat</th><th>Salaire affiché</th><th>Publiée</th></tr></thead><tbody></tbody></table>
+  <p class="note" id="note-offres"></p>
 
   <h2>Ce que ces chiffres n'autorisent pas à conclure</h2>
   <p class="note">Un seul canal : France Travail n'héberge pas toutes les offres cadres (APEC, LinkedIn, Welcome to the Jungle en publient d'autres).
-  Les salaires sont ceux des offres qui les affichent, souvent moins d'un tiers : biais probable vers le bas et vers les PME.
+  Les salaires sont ceux des offres qui les affichent, moins d'un tiers : biais probable vers le bas et vers les PME ; le net mensuel est une estimation (brut × 0,78 / 12, avant impôt sur le revenu).
   Une mention « IA » dans une annonce n'est pas une compétence exigée : il faut lire dix annonces pour dire ce que le mot recouvre.
-  La grille d'outils est la nôtre, elle est dans <code>scripts/resumer.py</code>.</p>
+  La grille d'outils est la nôtre, elle est dans <code>scripts/resumer.py</code>. Un point placé au centre d'une commune ou d'un département n'est pas l'adresse de l'employeur.</p>
 
   <footer id="pied"></footer>
 </main>
 
 <script>
-const euro = n => n == null ? "—" : n.toLocaleString("fr-FR") + " €";
+const euro = n => n == null ? "—" : Math.round(n).toLocaleString("fr-FR") + " €";
+const net = brutAnnuel => brutAnnuel * 0.78 / 12;
+const mediane = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+const compter = (liste, cle) => { const c = new Map(); for (const x of liste) { const k = cle(x); if (k == null) continue; c.set(k, (c.get(k) || 0) + 1); } return [...c].sort((a, b) => b[1] - a[1]); };
 const couleur = "#0a5cff", pale = "rgba(10,92,255,.25)";
+const COULEURS = { Marketing: "#0a5cff", Digital: "#ff6a00", Frontière: "#8e8e93" };
 Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', sans-serif";
 Chart.defaults.plugins.legend.display = false;
 
+let D, carte, calque, graphiques = {};
+
 function barres(id, etiquettes, valeurs, horizontal = true, suffixe = "") {
-  new Chart(document.getElementById(id), {
+  if (graphiques[id]) { graphiques[id].data.labels = etiquettes; graphiques[id].data.datasets[0].data = valeurs; graphiques[id].update(); return; }
+  graphiques[id] = new Chart(document.getElementById(id), {
     type: "bar",
     data: { labels: etiquettes, datasets: [{ data: valeurs, backgroundColor: couleur, borderRadius: 4 }] },
-    options: { indexAxis: horizontal ? "y" : "x", responsive: true,
+    options: { indexAxis: horizontal ? "y" : "x", responsive: true, animation: false,
       plugins: { tooltip: { callbacks: { label: c => c.parsed[horizontal ? "x" : "y"] + suffixe } } },
       scales: { x: { grid: { display: !horizontal } }, y: { grid: { display: horizontal } } } }
   });
 }
 
-fetch("data/resume.json").then(r => r.json()).then(d => {
-  document.getElementById("titre").textContent = d.metier + " — le marché, lu dans les offres";
-  document.getElementById("sous").innerHTML =
-    `Code ROME <b>${d.rome}</b> · ${d.source} · requête <code>${JSON.stringify(d.requete)}</code> · extraction du <b>${d.date}</b>`;
+function coches() { return new Set([...document.querySelectorAll("#metiers input:checked")].map(i => i.value)); }
 
-  const s = d.salaire;
+function rendre() {
+  const sel = coches();
+  const lib = Object.fromEntries(D.metiers.map(m => [m.code, m]));
+  const offres = D.offres.filter(o => sel.has(o.rome));
+  const n = offres.length;
+  document.getElementById("nb-coches").textContent = `— ${sel.size} métier(s) cochés, ${n} offres`;
+
+  const mins = offres.filter(o => o.smin).map(o => o.smin), maxs = offres.filter(o => o.smax).map(o => o.smax);
+  const dep63 = offres.filter(o => o.dep === "63").length;
+  const AURA = new Set(["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"]);
   const cartes = [
-    [d.total_api, "offres actives en France"],
-    [d.puy_de_dome, "dans le Puy-de-Dôme"],
-    [d.auvergne_rhone_alpes, "en Auvergne-Rhône-Alpes"],
-    [s.part_affichant + " %", `des offres affichent un salaire (${s.offres_affichant})`],
-    [s.min_median ? euro(s.min_median) + " → " + euro(s.max_median) : "—", "salaire annuel affiché, médiane des minima → des maxima"],
-    [d.teletravail_mentionne, "annonces qui mentionnent le télétravail"],
+    [n, "offres actives en France"],
+    [dep63, "dans le Puy-de-Dôme"],
+    [offres.filter(o => AURA.has(o.dep)).length, "en Auvergne-Rhône-Alpes"],
+    [offres.filter(o => o.alternance).length, "en alternance"],
+    [n ? Math.round(100 * mins.length / n) + " %" : "—", `affichent un salaire (${mins.length})`],
+    [mins.length ? euro(mediane(mins)) + " → " + euro(mediane(maxs)) : "—", "brut annuel affiché, médiane des minima → des maxima"],
+    [mins.length ? euro(net(mediane(mins))) + " → " + euro(net(mediane(maxs))) : "—", "net mensuel estimé (× 0,78 / 12, avant impôt)"],
+    [offres.filter(o => o.teletravail).length, "annonces qui mentionnent le télétravail"],
   ];
   document.getElementById("chiffres").innerHTML = cartes.map(([v, l]) => `<div class="chiffre"><b>${v}</b><span>${l}</span></div>`).join("");
 
-  barres("g-departements", d.departements.map(x => x[0]), d.departements.map(x => x[1]));
-  barres("g-contrats", d.contrats.map(x => x[0]), d.contrats.map(x => x[1]), false);
-  barres("g-outils", d.outils.map(x => x.nom), d.outils.map(x => x.part), true, " %");
-  barres("g-competences", d.competences.map(x => x[0].length > 45 ? x[0].slice(0, 44) + "…" : x[0]), d.competences.map(x => x[1]));
-  barres("g-entreprises", d.entreprises.map(x => x[0].length > 30 ? x[0].slice(0, 29) + "…" : x[0]), d.entreprises.map(x => x[1]));
+  // Carte
+  calque.clearLayers();
+  let places = 0;
+  for (const o of offres) {
+    if (o.lat == null) continue;
+    places++;
+    const g = lib[o.rome]?.groupe;
+    const m = L.circleMarker([o.lat, o.lon], { radius: o.prec === "offre" ? 5 : 4, color: COULEURS[g] || couleur, weight: 1, fillOpacity: o.prec === "departement" ? .25 : .6 });
+    m.bindPopup(`<b>${o.intitule}</b>${o.entreprise || "—"} · ${o.lieu || ""}<br>${o.contrat || ""}${o.salaire ? " · " + o.salaire : ""}<br><span style="color:#888">${lib[o.rome]?.libelle || o.rome}${o.prec !== "offre" ? " · position : " + o.prec : ""}</span>`, { closeButton: false });
+    m.on("mouseover", function () { this.openPopup(); });
+    if (o.url) m.on("click", () => window.open(o.url, "_blank", "noopener"));
+    calque.addLayer(m);
+  }
+  document.getElementById("note-carte").textContent =
+    `${places} offres placées (${n - places} sans lieu précis : « France », « Île-de-France »…). Bleu : cœur marketing, orange : digital, gris : frontière. Point pâle : placé au centre du département.`;
 
-  new Chart(document.getElementById("g-serie"), {
-    type: "line",
-    data: { labels: d.serie.map(x => x.date), datasets: [{ data: d.serie.map(x => x.total), borderColor: couleur, backgroundColor: pale, fill: true, tension: .2, pointRadius: 4 }] },
-    options: { scales: { y: { beginAtZero: true } } }
-  });
-  document.getElementById("note-serie").textContent = d.serie.length < 2
+  // Graphiques
+  const deps = compter(offres, o => o.dep || null).slice(0, 15);
+  barres("g-departements", deps.map(x => x[0]), deps.map(x => x[1]));
+  const contrats = compter(offres, o => o.contrat);
+  barres("g-contrats", contrats.map(x => x[0]), contrats.map(x => x[1]), false);
+  const outils = compter(offres.flatMap(o => o.outils), x => x).map(([k, v]) => [k, Math.round(100 * v / n)]);
+  barres("g-outils", outils.map(x => x[0]), outils.map(x => x[1]), true, " %");
+  const exp = compter(offres, o => o.experience).slice(0, 8);
+  barres("g-experience", exp.map(x => x[0]), exp.map(x => x[1]));
+  const comp = compter(offres.flatMap(o => o.competences), x => x).slice(0, 12);
+  barres("g-competences", comp.map(x => x[0]), comp.map(x => x[1]));
+  const ent = compter(offres, o => o.entreprise).slice(0, 10);
+  barres("g-entreprises", ent.map(x => x[0].length > 32 ? x[0].slice(0, 31) + "…" : x[0]), ent.map(x => x[1]));
+
+  const serie = D.serie.map(j => ({ date: j.date, total: [...sel].reduce((s, c) => s + (j.par_metier[c] || 0), 0) }));
+  if (graphiques.serie) { graphiques.serie.data.labels = serie.map(x => x.date); graphiques.serie.data.datasets[0].data = serie.map(x => x.total); graphiques.serie.update(); }
+  else graphiques.serie = new Chart(document.getElementById("g-serie"), {
+    type: "line", data: { labels: serie.map(x => x.date), datasets: [{ data: serie.map(x => x.total), borderColor: couleur, backgroundColor: pale, fill: true, tension: .2, pointRadius: 4 }] },
+    options: { animation: false, scales: { y: { beginAtZero: true } } } });
+  document.getElementById("note-serie").textContent = serie.length < 2
     ? "Une seule extraction pour l'instant : la tendance apparaîtra au fil des jours, l'Action GitHub relance la collecte chaque matin."
-    : `${d.serie.length} extractions, du ${d.serie[0].date} au ${d.serie[d.serie.length - 1].date}.`;
+    : `${serie.length} extractions, du ${serie[0].date} au ${serie[serie.length - 1].date}.`;
 
-  document.querySelector("#offres tbody").innerHTML = d.offres.map(o =>
-    `<tr><td>${o.url ? `<a href="${o.url}" target="_blank" rel="noopener">${o.intitule}</a>` : o.intitule}</td><td>${o.entreprise || "—"}</td><td>${o.lieu || "—"}</td><td>${o.contrat || "—"}</td><td>${o.salaire || "—"}</td><td>${o.date}</td></tr>`).join("");
+  // Tableau : les 300 plus récentes
+  const recentes = [...offres].sort((a, b) => (b.date || "").localeCompare(a.date || "")).slice(0, 300);
+  document.querySelector("#offres tbody").innerHTML = recentes.map(o =>
+    `<tr><td>${o.url ? `<a href="${o.url}" target="_blank" rel="noopener">${o.intitule}</a>` : o.intitule}</td><td>${lib[o.rome]?.libelle || o.rome}</td><td>${o.entreprise || "—"}</td><td>${o.lieu || "—"}</td><td>${o.contrat || "—"}</td><td>${o.salaire || "—"}</td><td>${o.date}</td></tr>`).join("");
+  document.getElementById("nb-offres").textContent = `— ${Math.min(300, n)} affichées sur ${n}, les plus récentes d'abord`;
+  document.getElementById("note-offres").textContent = n > 300 ? "Le tableau est limité à 300 lignes ; le CSV du jour est dans data/ sur le dépôt." : "";
+
+  try { localStorage.setItem("metiers-coches", JSON.stringify([...sel])); } catch (e) {}
+}
+
+fetch("data/resume.json").then(r => r.json()).then(d => {
+  D = d;
+  document.getElementById("sous").innerHTML =
+    `${d.source} · ${d.requete} · extraction du <b>${d.date}</b> · ${d.offres.length} offres actives, ${d.versions_conservees} versions d'annonces conservées`;
+
+  let memo = null;
+  try { memo = JSON.parse(localStorage.getItem("metiers-coches")); } catch (e) {}
+  const groupes = [...new Set(d.metiers.map(m => m.groupe))];
+  document.getElementById("metiers").innerHTML = groupes.map(g => `<h4 style="color:${COULEURS[g] || ""}">${g}</h4>` +
+    d.metiers.filter(m => m.groupe === g).map(m =>
+      `<label><input type="checkbox" value="${m.code}" data-groupe="${m.groupe}" ${(memo ? memo.includes(m.code) : m.coche) ? "checked" : ""}> ${m.libelle} <small>${m.code} · ${m.actives}</small></label>`).join("")).join("");
+  document.getElementById("metiers").addEventListener("change", rendre);
+  document.querySelectorAll(".boutons button").forEach(b => b.addEventListener("click", () => {
+    const g = b.dataset.groupe;
+    document.querySelectorAll("#metiers input").forEach(i => { i.checked = g === "tous" ? true : g === "aucun" ? false : i.dataset.groupe === g; });
+    rendre();
+  }));
+
+  carte = L.map("map", { scrollWheelZoom: false }).setView([46.6, 2.4], 6);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap, &copy; CARTO" }).addTo(carte);
+  calque = L.layerGroup().addTo(carte);
 
   document.getElementById("pied").innerHTML =
-    `Chaîne : API France Travail → <code>scripts/extraire.py</code> → <code>data/</code> (JSON brut + CSV, versionnés) → <code>scripts/resumer.py</code> → <code>data/resume.json</code> → cette page (GitHub Pages).
+    `Chaîne : API France Travail → <code>scripts/extraire.py</code> → <code>data/brut/</code> (chaque version d'annonce, une seule fois) + <code>data/actives/</code> (les offres du jour) → <code>scripts/resumer.py</code> → <code>data/resume.json</code> → cette page (GitHub Pages).
      Une Action GitHub relance la collecte chaque matin à 7 h. Identifiants dans les secrets du dépôt, jamais dans le code.
      Dépôt de démonstration — M2 MOD, IAE Clermont Auvergne, séminaires métiers.`;
+  rendre();
 }).catch(e => { document.getElementById("sous").textContent = "Impossible de lire data/resume.json : " + e; });
 </script>
 </body>

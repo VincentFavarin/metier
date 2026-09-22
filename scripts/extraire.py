@@ -1,15 +1,16 @@
-r"""Récupère les offres France Travail d'un métier et les enregistre dans data/.
+r"""Récupère les offres France Travail des métiers suivis et les enregistre dans data/.
 
 Usage :
-    .venv\Scripts\python.exe scripts\extraire.py                     # requête de la veille (CODE_ROME)
-    .venv\Scripts\python.exe scripts\extraire.py --verifier          # teste seulement la connexion
-    .venv\Scripts\python.exe scripts\extraire.py --rome "" --mots "marketing digital"   # par mots plutôt que par code
-    .venv\Scripts\python.exe scripts\extraire.py --departement 63
+    .venv\Scripts\python.exe scripts\extraire.py                 # tous les métiers de METIERS
+    .venv\Scripts\python.exe scripts\extraire.py --verifier      # teste seulement la connexion
+    .venv\Scripts\python.exe scripts\extraire.py --rome M1718    # un seul code, pour essayer
 
-Produit, pour chaque extraction datée :
-    data/brut/offres_<date>.json   les offres telles que l'API les renvoie (JSON complet)
-    data/offres_<date>.csv         une ligne par offre, colonnes lisibles
-    data/serie.csv                 une ligne par extraction : date, requête, total (la tendance)
+Ce que ça écrit :
+    data/brut/<AAAA-MM>/<ROME>.jsonl   une ligne par offre complète (JSON tel que l'API le renvoie),
+                                       écrite la première fois qu'on voit l'offre, et de nouveau
+                                       si son contenu a changé (une version = une ligne, datée)
+    data/actives/<date>.csv            les offres actives ce jour-là : rome, id, date d'actualisation
+    data/serie.csv                     une ligne par métier et par jour : total, nouvelles, modifiées
 
 Les identifiants sont lus dans le fichier .env (voir .env.example) ou dans l'environnement
 (secrets GitHub Actions). API : https://francetravail.io/data/api/offres-emploi —
@@ -17,6 +18,7 @@ Les identifiants sont lus dans le fichier .env (voir .env.example) ou dans l'env
 """
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -25,18 +27,48 @@ import time
 from datetime import date
 from pathlib import Path
 
-import pandas as pd
 import requests
 from dotenv import load_dotenv
 
 RACINE = Path(__file__).resolve().parent.parent
 load_dotenv(RACINE / ".env")
 
-MOTS_CLES = ""
-CODE_ROME = "M1718"       # Chargé / Chargée de marketing digital — requête de la veille
+# Les métiers suivis : code ROME -> (libellé, groupe, coché par défaut sur la page).
+# Choisis pour le M2 Marketing Opérationnel et Digital ; la page permet de cocher/décocher.
+METIERS = {
+    # Cœur marketing
+    "M1718": ("Chargé(e) de marketing digital", "Marketing", True),
+    "M1716": ("Directeur(trice) marketing digital", "Marketing", True),
+    "M1705": ("Responsable marketing", "Marketing", True),
+    "M1703": ("Chef(fe) de produit", "Marketing", True),
+    "M1620": ("Assistant(e) marketing", "Marketing", True),
+    "M1706": ("Chef(fe) de promotion des ventes", "Marketing", True),
+    "M1430": ("Chargé(e) d'études commerciales", "Marketing", True),
+    "M1711": ("Directeur(trice) du marketing", "Marketing", True),
+    # Digital, contenu, e-commerce
+    "E1113": ("Responsable e-commerce", "Digital", True),
+    "D1438": ("Assistant(e) e-commerce", "Digital", True),
+    "E1101": ("Community manager", "Digital", True),
+    "E1124": ("Social media manager", "Digital", True),
+    "E1405": ("Référenceur(se) web (SEO)", "Digital", True),
+    "M1886": ("Chef(fe) de projet web", "Digital", True),
+    "M1426": ("Chief digital officer", "Digital", True),
+    "M1719": ("Chargé(e) des relations avec les influenceurs", "Digital", True),
+    "E1406": ("Influenceur(se) web", "Digital", True),
+    # Communication et commerce, à la frontière
+    "E1112": ("Chargé(e) de communication", "Frontière", False),
+    "E1103": ("Chargé(e) des relations publiques", "Frontière", False),
+    "E1107": ("Chef(fe) de projet événementiel", "Frontière", False),
+    "E1404": ("Assistant(e) en publicité", "Frontière", False),
+    "D1506": ("Chargé(e) de merchandising", "Frontière", False),
+    "D1415": ("Chargé(e) de relation client (CRM)", "Frontière", False),
+}
 
 TOKEN_URL = "https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=/partenaire"
 SEARCH_URL = "https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search"
+
+# Champs qui bougent sans que l'offre change : ignorés pour décider si une offre a été modifiée.
+CHAMPS_VOLATILS = {"dateActualisation"}
 
 
 def obtenir_token():
@@ -76,84 +108,91 @@ def chercher(token, params, pas=150, maximum=1150):
     return offres, total
 
 
-def departement(lieu):
-    """Code département : depuis le code postal, sinon depuis le libellé du type '75 - Paris'."""
-    cp = lieu.get("codePostal") or ""
-    if cp[:2].isdigit():
-        return cp[:2]
-    m = re.match(r"\s*(\d{2})\s*-", lieu.get("libelle") or "")
-    return m.group(1) if m else ""
+def empreinte(offre):
+    """Empreinte du contenu d'une offre, champs volatils exclus : change si l'annonce change."""
+    stable = {k: v for k, v in offre.items() if k not in CHAMPS_VOLATILS}
+    return hashlib.sha1(json.dumps(stable, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()[:16]
 
 
-def en_tableau(offres):
-    lignes = []
-    for o in offres:
-        lignes.append({
-            "id": o.get("id"),
-            "intitule": o.get("intitule"),
-            "entreprise": (o.get("entreprise") or {}).get("nom"),
-            "lieu": (o.get("lieuTravail") or {}).get("libelle"),
-            "departement": departement(o.get("lieuTravail") or {}),
-            "contrat": o.get("typeContrat"),
-            "experience": o.get("experienceLibelle"),
-            "salaire": (o.get("salaire") or {}).get("libelle"),
-            "date_publication": (o.get("dateCreation") or "")[:10],
-            "rome": o.get("romeCode"),
-            "competences": " | ".join(c.get("libelle", "") for c in o.get("competences") or []),
-            "url": (o.get("origineOffre") or {}).get("urlOrigine"),
-        })
-    return pd.DataFrame(lignes)
+def versions_connues():
+    """Toutes les (id, empreinte) déjà enregistrées dans data/brut, pour ne rien écrire deux fois."""
+    vues = set()
+    for f in (RACINE / "data" / "brut").glob("*/*.jsonl"):
+        with f.open(encoding="utf-8") as fh:
+            for ligne in fh:
+                if ligne.strip():
+                    v = json.loads(ligne)
+                    vues.add((v["id"], v["empreinte"]))
+    return vues
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--verifier", action="store_true", help="teste seulement la connexion")
-    ap.add_argument("--mots", default=MOTS_CLES, help='mots-clés ; "" pour ne pas filtrer')
-    ap.add_argument("--rome", default=CODE_ROME, help='code ROME, ex. "M1718" ; vide = pas de filtre')
-    ap.add_argument("--departement", default="", help='ex. "63" ; vide = France entière')
+    ap.add_argument("--rome", default="", help="un seul code ROME de METIERS, pour essayer")
     args = ap.parse_args()
 
     token = obtenir_token()
     print("Connexion à l'API France Travail : OK")
     if args.verifier:
         return
+    codes = [args.rome] if args.rome else list(METIERS)
+    if args.rome and args.rome not in METIERS:
+        sys.exit(f"{args.rome} n'est pas dans METIERS (scripts/extraire.py).")
 
-    params = {}
-    if args.mots:
-        params["motsCles"] = args.mots
-    if args.rome:
-        params["codeROME"] = args.rome
-    if args.departement:
-        params["departement"] = args.departement
-    if not params:
-        sys.exit("Il faut au moins des mots-clés ou un code ROME.")
-
-    offres, total = chercher(token, params)
-    df = en_tableau(offres)
     aujourdhui = f"{date.today():%Y-%m-%d}"
-    slug_mots = re.sub(r"[^a-z0-9]+", "-", args.mots.lower()).strip("-")
-    etiquette = "_".join(filter(None, [args.rome, slug_mots, args.departement]))
-    suffixe = f"_{etiquette}" if etiquette else ""
+    mois = aujourdhui[:7]
+    vues = versions_connues()
+    ids_connus = {i for i, _ in vues}
+    (RACINE / "data" / "brut" / mois).mkdir(parents=True, exist_ok=True)
+    (RACINE / "data" / "actives").mkdir(parents=True, exist_ok=True)
 
-    (RACINE / "data" / "brut").mkdir(parents=True, exist_ok=True)
-    brut = RACINE / "data" / "brut" / f"offres{suffixe}_{aujourdhui}.json"
-    brut.write_text(json.dumps({"requete": params, "date": aujourdhui, "total": total,
-                                "offres": offres}, ensure_ascii=False, indent=1), encoding="utf-8")
-    sortie = RACINE / "data" / f"offres{suffixe}_{aujourdhui}.csv"
-    df.to_csv(sortie, index=False, encoding="utf-8-sig")
+    actives, lignes_serie = [], []
+    for code in codes:
+        offres, total = chercher(token, {"codeROME": code})
+        nouvelles = modifiees = 0
+        with (RACINE / "data" / "brut" / mois / f"{code}.jsonl").open("a", encoding="utf-8") as brut:
+            for o in offres:
+                e = empreinte(o)
+                if (o["id"], e) not in vues:
+                    if o["id"] in ids_connus:
+                        modifiees += 1
+                    else:
+                        nouvelles += 1
+                        ids_connus.add(o["id"])
+                    vues.add((o["id"], e))
+                    brut.write(json.dumps({"id": o["id"], "empreinte": e, "vu_le": aujourdhui,
+                                           "rome": code, "offre": o}, ensure_ascii=False) + "\n")
+                actives.append((code, o["id"], (o.get("dateActualisation") or "")[:10]))
+        lignes_serie.append([aujourdhui, code, total if total is not None else len(offres),
+                             len(offres), nouvelles, modifiees])
+        print(f"{code}  {METIERS[code][0]:<48} {len(offres):5d} offres, {nouvelles:4d} nouvelles, {modifiees:3d} modifiées")
+        time.sleep(0.5)
+
+    # Même logique pour les actives du jour : on remplace les codes relancés, on garde les autres.
+    fichier_actives = RACINE / "data" / "actives" / f"{aujourdhui}.csv"
+    if fichier_actives.exists():
+        with fichier_actives.open(encoding="utf-8") as f:
+            actives = [tuple(r) for r in list(csv.reader(f))[1:] if r[0] not in codes] + actives
+    with fichier_actives.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["rome", "id", "date_actualisation"])
+        w.writerows(sorted(actives))
 
     serie = RACINE / "data" / "serie.csv"
-    nouveau = not serie.exists()
-    with serie.open("a", newline="", encoding="utf-8") as f:
+    lignes = []
+    if serie.exists():
+        with serie.open(encoding="utf-8") as f:
+            lignes = [r for r in csv.reader(f)][1:]
+    # Si on relance le même jour, la ligne du jour est remplacée, pas doublée.
+    lignes = [r for r in lignes if not (r[0] == aujourdhui and r[1] in codes)] + lignes_serie
+    with serie.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        if nouveau:
-            w.writerow(["date", "mots_cles", "rome", "departement", "total", "recuperees"])
-        w.writerow([aujourdhui, args.mots, args.rome, args.departement, total, len(df)])
+        w.writerow(["date", "rome", "total", "recuperees", "nouvelles", "modifiees"])
+        w.writerows(sorted(lignes))
 
-    print(f"Requête : {params} — extraction du {aujourdhui}")
-    print(f"Offres annoncées par l'API : {total} ; récupérées : {len(df)}")
-    print(f"Écrit : {sortie.relative_to(RACINE)} et {brut.relative_to(RACINE)}")
-    print(df[["intitule", "entreprise", "lieu", "contrat", "salaire"]].head().to_string())
+    print(f"\n{aujourdhui} : {len(actives)} offres actives sur {len(codes)} métiers — "
+          f"{sum(r[4] for r in lignes_serie)} nouvelles versions, {sum(r[5] for r in lignes_serie)} modifiées.")
 
 
 if __name__ == "__main__":

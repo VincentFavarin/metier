@@ -1,21 +1,30 @@
-r"""Lit la dernière extraction de la veille (data/brut/offres_M1718_<date>.json) et écrit
-data/resume.json, le fichier que la page index.html affiche.
+r"""Lit les offres actives du jour (data/actives/<date>.csv), retrouve leur dernière version dans
+data/brut, et écrit data/resume.json : le fichier que la page index.html affiche.
 
 Usage :
     .venv\Scripts\python.exe scripts\resumer.py
 
-C'est ici que la donnée brute est retravaillée : salaire (libellé texte -> minimum et maximum
-annuels), outils cités dans la description (liste de mots à adapter à votre métier), comptages.
+C'est ici que la donnée brute est retravaillée :
+  - salaire : libellé texte -> minimum et maximum annuels bruts ;
+  - outils cités dans l'intitulé + la description (grille OUTILS, à adapter à votre métier) ;
+  - position sur la carte : latitude/longitude de l'API quand elle les donne, sinon le centre
+    de la commune (geo.api.gouv.fr, mis en cache dans data/geo/), sinon la ville principale
+    du département ; les offres « France » n'ont pas de point.
+La page recalcule ensuite tous les comptages côté navigateur, selon les métiers cochés.
 """
 import csv
 import json
 import re
-import statistics
-from collections import Counter
+import sys
+import time
+from collections import defaultdict
 from pathlib import Path
 
+import requests
+
 RACINE = Path(__file__).resolve().parent.parent
-CODE_ROME = "M1718"
+sys.path.insert(0, str(RACINE / "scripts"))
+from extraire import METIERS  # noqa: E402  (la liste des métiers vit dans un seul fichier)
 
 # Les outils et compétences que l'on cherche dans les annonces : c'est VOTRE grille, adaptez-la.
 # Chaque entrée : libellé affiché -> variantes cherchées (mot entier, insensible à la casse).
@@ -25,7 +34,7 @@ OUTILS = {
     "Meta Ads": ["meta ads", "facebook ads", "instagram ads"],
     "Google Analytics": ["google analytics", "ga4", "analytics"],
     "HubSpot": ["hubspot"],
-    "CRM": ["crm", "salesforce"],
+    "CRM / Salesforce": ["crm", "salesforce"],
     "Emailing": ["emailing", "e-mailing", "newsletter", "mailchimp", "brevo", "sendinblue"],
     "Réseaux sociaux": ["réseaux sociaux", "social media", "community management"],
     "LinkedIn": ["linkedin"],
@@ -40,11 +49,10 @@ OUTILS = {
     "IA générative": ["ia", "intelligence artificielle", "chatgpt", "ia générative", "genai", "llm"],
     "Anglais": ["anglais", "english"],
 }
+REGEX_OUTILS = {nom: re.compile(r"(?<![\w-])(" + "|".join(re.escape(v) for v in variantes) + r")(?![\w-])")
+                for nom, variantes in OUTILS.items()}
 
-
-def cherche(texte, variantes):
-    t = texte.lower()
-    return any(re.search(r"(?<![\w-])" + re.escape(v) + r"(?![\w-])", t) for v in variantes)
+GEO = "https://geo.api.gouv.fr"
 
 
 def salaire_min_max(lib):
@@ -55,101 +63,156 @@ def salaire_min_max(lib):
     l = lib.lower()
     mult = 12 if "mensuel" in l else (1607 if "horaire" in l else 1)
     vals = [n * mult for n in nombres if n * mult > 5000]   # écarte '13 mois', '35 h'…
-    return (min(vals), max(vals)) if vals else (None, None)
+    return (round(min(vals)), round(max(vals))) if vals else (None, None)
+
+
+def departement(lieu):
+    cp = lieu.get("codePostal") or ""
+    if cp[:2].isdigit() and cp != "99999":
+        return "2A" if cp[:2] == "20" and cp < "20200" else ("2B" if cp[:2] == "20" else cp[:2])
+    m = re.match(r"\s*(\d{2}|2A|2B)\s*-", lieu.get("libelle") or "")
+    return m.group(1) if m else ""
+
+
+class Geocodeur:
+    """Centre des communes et villes principales des départements, via geo.api.gouv.fr, avec cache."""
+
+    def __init__(self):
+        self.dossier = RACINE / "data" / "geo"
+        self.dossier.mkdir(parents=True, exist_ok=True)
+        self.communes = self._lire("communes.json")
+        self.departements = self._lire("departements.json")
+        self.appels = 0
+
+    def _lire(self, nom):
+        f = self.dossier / nom
+        return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+    def _get(self, url):
+        self.appels += 1
+        time.sleep(0.05)
+        try:
+            r = requests.get(url, timeout=15)
+            return r.json() if r.status_code == 200 else None
+        except requests.RequestException:
+            return None
+
+    def commune(self, code):
+        if code not in self.communes:
+            d = self._get(f"{GEO}/communes/{code}?fields=centre")
+            self.communes[code] = d["centre"]["coordinates"][::-1] if d and d.get("centre") else None
+        return self.communes[code]
+
+    def departement(self, code):
+        if code not in self.departements:
+            d = self._get(f"{GEO}/communes?codeDepartement={code}&fields=centre&boost=population&limit=1")
+            self.departements[code] = d[0]["centre"]["coordinates"][::-1] if d else None
+        return self.departements[code]
+
+    def position(self, lieu):
+        """(lat, lon, précision) ; précision = 'offre', 'commune', 'departement' ou None."""
+        if lieu.get("latitude") and lieu.get("longitude"):
+            return lieu["latitude"], lieu["longitude"], "offre"
+        if lieu.get("commune"):
+            p = self.commune(lieu["commune"])
+            if p:
+                return p[0], p[1], "commune"
+        dep = departement(lieu)
+        if dep:
+            p = self.departement(dep)
+            if p:
+                return p[0], p[1], "departement"
+        return None, None, None
+
+    def sauver(self):
+        (self.dossier / "communes.json").write_text(json.dumps(self.communes), encoding="utf-8")
+        (self.dossier / "departements.json").write_text(json.dumps(self.departements), encoding="utf-8")
 
 
 def main():
-    fichiers = sorted((RACINE / "data" / "brut").glob(f"offres_{CODE_ROME}_*.json"))
-    if not fichiers:
+    jours = sorted((RACINE / "data" / "actives").glob("*.csv"))
+    if not jours:
         raise SystemExit("Aucune extraction : lancez d'abord scripts/extraire.py")
-    d = json.loads(fichiers[-1].read_text(encoding="utf-8"))
-    offres = d["offres"]
-    n = len(offres)
+    jour = jours[-1].stem
+    with jours[-1].open(encoding="utf-8") as f:
+        actives = [(r["rome"], r["id"]) for r in csv.DictReader(f)]
+    ids_actifs = {i for _, i in actives}
 
-    # Salaires
-    mins, maxs = [], []
-    for o in offres:
-        smin, smax = salaire_min_max((o.get("salaire") or {}).get("libelle"))
-        if smin:
-            mins.append(smin); maxs.append(smax)
+    # Dernière version connue de chaque offre active (les fichiers sont lus dans l'ordre des mois).
+    versions = {}
+    for f in sorted((RACINE / "data" / "brut").glob("*/*.jsonl")):
+        with f.open(encoding="utf-8") as fh:
+            for ligne in fh:
+                if ligne.strip():
+                    v = json.loads(ligne)
+                    if v["id"] in ids_actifs:
+                        versions[v["id"]] = v
+    nb_versions = sum(1 for f in (RACINE / "data" / "brut").glob("*/*.jsonl")
+                      for l in f.open(encoding="utf-8") if l.strip())
 
-    # Outils cités dans intitulé + description
-    outils = Counter()
-    for o in offres:
-        texte = (o.get("intitule") or "") + " " + (o.get("description") or "")
-        for nom, variantes in OUTILS.items():
-            if cherche(texte, variantes):
-                outils[nom] += 1
-
-    # Compétences telles que France Travail les code
-    competences = Counter(c.get("libelle") for o in offres for c in o.get("competences") or [] if c.get("libelle"))
-
-    def dep(o):
+    geo = Geocodeur()
+    offres = []
+    for rome, oid in actives:
+        v = versions.get(oid)
+        if not v:
+            continue
+        o = v["offre"]
         lieu = o.get("lieuTravail") or {}
-        cp = lieu.get("codePostal") or ""
-        if cp[:2].isdigit():
-            return cp[:2]
-        m = re.match(r"\s*(\d{2})\s*-", lieu.get("libelle") or "")
-        return m.group(1) if m else "?"
-
-    departements = Counter(dep(o) for o in offres)
-    contrats = Counter(o.get("typeContrat") or "?" for o in offres)
-    entreprises = Counter((o.get("entreprise") or {}).get("nom") or "(non communiquée)" for o in offres)
-    experience = Counter(o.get("experienceLibelle") or "?" for o in offres)
-    teletravail = sum(1 for o in offres if "télétravail" in (o.get("description") or "").lower())
-
-    # Série : une ligne par extraction de la même requête
-    serie = []
-    with (RACINE / "data" / "serie.csv").open(encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            if r["rome"] == CODE_ROME and not r["departement"]:
-                serie.append({"date": r["date"], "total": int(r["total"])})
-
-    resume = {
-        "metier": "Chargé / Chargée de marketing digital",
-        "rome": CODE_ROME,
-        "requete": d["requete"],
-        "date": d["date"],
-        "source": "France Travail — API Offres d'emploi v2",
-        "total_api": d["total"],
-        "recuperees": n,
-        "puy_de_dome": departements.get("63", 0),
-        "auvergne_rhone_alpes": sum(departements.get(x, 0) for x in
-                                    ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"]),
-        "teletravail_mentionne": teletravail,
-        "salaire": {
-            "offres_affichant": len(mins),
-            "part_affichant": round(100 * len(mins) / n) if n else 0,
-            "min_median": round(statistics.median(mins)) if mins else None,
-            "max_median": round(statistics.median(maxs)) if maxs else None,
-            "min_bas": round(min(mins)) if mins else None,
-            "max_haut": round(max(maxs)) if maxs else None,
-        },
-        "contrats": contrats.most_common(),
-        "experience": experience.most_common(5),
-        "departements": departements.most_common(12),
-        "outils": [{"nom": k, "offres": v, "part": round(100 * v / n)} for k, v in outils.most_common()],
-        "competences": competences.most_common(12),
-        "entreprises": entreprises.most_common(10),
-        "serie": serie,
-        "offres": [{
+        texte = (o.get("intitule") or "") + " " + (o.get("description") or "")
+        t = texte.lower()
+        smin, smax = salaire_min_max((o.get("salaire") or {}).get("libelle"))
+        lat, lon, precision = geo.position(lieu)
+        offres.append({
+            "id": oid,
+            "rome": rome,
             "intitule": o.get("intitule"),
             "entreprise": (o.get("entreprise") or {}).get("nom"),
-            "lieu": (o.get("lieuTravail") or {}).get("libelle"),
+            "lieu": lieu.get("libelle"),
+            "dep": departement(lieu),
+            "lat": lat, "lon": lon, "prec": precision,
             "contrat": o.get("typeContrat"),
+            "experience": o.get("experienceLibelle"),
+            "alternance": bool(o.get("alternance")),
             "salaire": (o.get("salaire") or {}).get("libelle"),
+            "smin": smin, "smax": smax,
             "date": (o.get("dateCreation") or "")[:10],
+            "vu_le": v["vu_le"],
             "url": (o.get("origineOffre") or {}).get("urlOrigine"),
-        } for o in sorted(offres, key=lambda o: o.get("dateCreation") or "", reverse=True)],
+            "outils": [nom for nom, rx in REGEX_OUTILS.items() if rx.search(t)],
+            "teletravail": "télétravail" in t,
+            "competences": [c.get("libelle") for c in o.get("competences") or [] if c.get("libelle")],
+        })
+    geo.sauver()
+
+    # Série : par jour et par métier
+    serie = defaultdict(dict)
+    with (RACINE / "data" / "serie.csv").open(encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            serie[r["date"]][r["rome"]] = int(r["total"])
+
+    resume = {
+        "date": jour,
+        "source": "France Travail — API Offres d'emploi v2",
+        "requete": "une requête codeROME par métier, France entière",
+        "metiers": [{"code": c, "libelle": l, "groupe": g, "coche": k,
+                     "actives": sum(1 for o in offres if o["rome"] == c)}
+                    for c, (l, g, k) in METIERS.items()],
+        "outils": list(OUTILS),
+        "versions_conservees": nb_versions,
+        "sans_position": sum(1 for o in offres if o["lat"] is None),
+        "serie": [{"date": d, "par_metier": m} for d, m in sorted(serie.items())],
+        "offres": offres,
     }
     sortie = RACINE / "data" / "resume.json"
-    sortie.write_text(json.dumps(resume, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"Écrit : {sortie.relative_to(RACINE)} — {n} offres du {d['date']}")
-    print(f"Salaire annuel affiché par {len(mins)} offres ({resume['salaire']['part_affichant']} %) : "
-          f"médiane des minima {resume['salaire']['min_median']} €, des maxima {resume['salaire']['max_median']} €")
-    print("Outils :", ", ".join(f"{o['nom']} {o['part']} %" for o in resume["outils"][:8]))
-    print("Départements :", departements.most_common(6))
-    print("Entreprises :", entreprises.most_common(5))
+    sortie.write_text(json.dumps(resume, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    prec = defaultdict(int)
+    for o in offres:
+        prec[o["prec"]] += 1
+    print(f"Écrit : {sortie.relative_to(RACINE)} — {len(offres)} offres actives du {jour}, "
+          f"{sortie.stat().st_size // 1024} Ko")
+    print(f"Positions : {dict(prec)} ({geo.appels} appels geo.api.gouv.fr)")
+    avec = [o for o in offres if o["smin"]]
+    print(f"Salaire affiché par {len(avec)} offres sur {len(offres)} ({100 * len(avec) // len(offres)} %)")
 
 
 if __name__ == "__main__":

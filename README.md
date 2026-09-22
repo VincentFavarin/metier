@@ -38,21 +38,51 @@ Hauts-de-Seine en tête ; 27 % des offres affichent un salaire, médiane
 31 000 → 35 700 € annuels ; réseaux sociaux, anglais, SEO/SEA, GA4 et
 « IA » reviennent le plus.
 
+## Les métiers suivis
+
+23 codes ROME, choisis pour le M2 MOD parmi les 1 911 du référentiel France
+Travail (la liste vit dans `scripts/extraire.py`, `METIERS`) : le cœur
+marketing (M1718 chargé de marketing digital, M1716, M1705, M1703, M1620,
+M1706, M1430, M1711), le digital (E1113 e-commerce, D1438, E1101 community
+manager, E1124, E1405 SEO, M1886, M1426, M1719 et E1406 influence — 0 offre
+aujourd'hui, on surveille) et, décochés par défaut, la frontière avec la
+communication et le commerce (E1112, E1103, E1107, E1404, D1506, D1415 CRM).
+Au 22/09/2026 : 3 362 offres actives.
+
 ## La chaîne
 
 ```
-API France Travail  →  scripts/extraire.py  →  data/brut/*.json (brut) + data/*.csv + data/serie.csv
-                                            →  scripts/resumer.py  →  data/resume.json  →  index.html (GitHub Pages)
+API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl   chaque version d'annonce, une seule fois
+                                            →  data/actives/<date>.csv         les offres actives du jour (rome, id)
+                                            →  data/serie.csv                  par jour et par métier : total, nouvelles, modifiées
+                       scripts/resumer.py   →  data/resume.json                ce que la page affiche (+ data/geo/, cache des positions)
+                       index.html           →  https://vincentfavarin.github.io/metier/
                        .github/workflows/veille.yml : GitHub relance tout ça chaque matin à 7 h
 ```
 
-- `scripts/extraire.py` — appelle l'API (token OAuth, pagination 150 / 1 150,
-  total lu dans `Content-Range`), enregistre le JSON brut et un CSV datés,
-  ajoute une ligne à `data/serie.csv` (la tendance).
-- `scripts/resumer.py` — retravaille le brut : salaires (libellé texte →
-  min/max annuels), outils cités dans les descriptions (grille à adapter),
-  comptages par département, contrat, entreprise ; écrit `data/resume.json`.
-- `index.html` — lit `data/resume.json` et trace les graphiques (Chart.js).
+- `scripts/extraire.py` — une requête `codeROME` par métier (token OAuth,
+  pagination 150 / 1 150, total lu dans `Content-Range`). Le **brut est
+  conservé intégralement** : une offre est écrite la première fois qu'on la
+  voit, et de nouveau si son contenu change (empreinte SHA-1 du JSON, hors
+  `dateActualisation`) — l'évolution d'une annonce est donc gardée, version
+  par version. Relancer le même jour n'écrit rien deux fois.
+- `scripts/resumer.py` — retravaille le brut des offres actives : salaires
+  (libellé texte → min/max annuels bruts), outils cités dans les descriptions
+  (grille à adapter), position (lat/lon de l'API, sinon centre de la commune
+  via geo.api.gouv.fr, sinon ville principale du département).
+- `index.html` — liste à cocher des métiers ; carte Leaflet (survol = l'offre,
+  clic = l'annonce sur France Travail) ; graphiques Chart.js recalculés dans le
+  navigateur selon la sélection ; net mensuel estimé = brut × 0,78 / 12.
+
+## Volume et limites GitHub
+
+Jour 1 : 13 Mo de brut ; ensuite seulement le flux (nouvelles et modifiées),
+de l'ordre de 2 à 3 Mo par jour, soit ~1 Go par an. GitHub gratuit : dépôt
+1 Go recommandé, fichier ≤ 100 Mo, Pages 1 Go publié et 100 Go/mois de bande
+passante, Actions illimitées sur un dépôt public. Quand le brut dépassera
+quelques centaines de Mo, l'Action archivera chaque mois écoulé (compressé)
+dans les Releases du dépôt ou sur Hugging Face Datasets, et le dépôt ne
+gardera que les derniers mois.
 
 ## Faire tourner chez soi
 
