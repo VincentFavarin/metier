@@ -1,4 +1,17 @@
-# Le marché de mon métier — chargé(e) de marketing digital
+# Le marché de mon métier — les métiers du marketing
+
+### 👉 **[Voir le site : vincentfavarin.github.io/metier](https://vincentfavarin.github.io/metier/)**
+
+Le site est mis à jour chaque matin par une Action GitHub : elle interroge
+l'API France Travail, enregistre les offres du jour et publie les chiffres.
+
+| | |
+|---|---|
+| [Accueil](https://vincentfavarin.github.io/metier/) | les filtres, les chiffres, la carte de France |
+| [Ce que ça paie](https://vincentfavarin.github.io/metier/salaires.html) | fourchettes par niveau, métier, contrat, territoire |
+| [Ce qu'on vous demande](https://vincentfavarin.github.io/metier/exigences.html) | expérience, diplôme, outils, compétences |
+| [Qui recrute](https://vincentfavarin.github.io/metier/recruteurs.html) | entreprises, secteurs, employeurs ouverts aux débutants |
+| [Le marché bouge](https://vincentfavarin.github.io/metier/mouvement.html) | les extractions successives, la fraîcheur des annonces |
 
 Dossier de travail pour la séance « Écouter le marché de votre métier »
 (M2 MOD, IAE Clermont Auvergne). Dépôt de démonstration : il montre ce que
