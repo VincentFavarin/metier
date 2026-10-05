@@ -70,7 +70,7 @@ API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl
                                             →  data/serie.csv                  par jour et par métier : total, nouvelles, modifiées
                        scripts/resumer.py   →  data/resume.json                ce que les pages affichent (+ data/geo/, cache des positions)
                        index.html + 4 pages →  https://vincentfavarin.github.io/metier/
-                       .github/workflows/veille.yml : GitHub relance tout ça chaque matin à 7 h
+                       .github/workflows/veille.yml : GitHub relance tout ça chaque jour
 ```
 
 - `scripts/extraire.py` — une requête `codeROME` par métier (token OAuth,

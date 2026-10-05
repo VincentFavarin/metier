@@ -1,11 +1,11 @@
-# La veille : chaque matin, GitHub lance l'extraction France Travail sur ses machines,
+# La veille : chaque jour, GitHub lance l'extraction France Travail sur ses machines,
 # met à jour data/ et le résumé de la page, et enregistre le tout par un commit.
 # Les identifiants sont dans Settings -> Secrets and variables -> Actions (FT_CLIENT_ID, FT_CLIENT_SECRET).
 name: veille
 
 on:
   schedule:
-    - cron: "0 5 * * *"       # 5 h UTC = 7 h à Paris en été (6 h en hiver) ; GitHub ne connaît que l'UTC
+    - cron: "0 5 * * *"       # demandé à 5 h UTC ; GitHub retarde les tâches programmées, elles partent en pratique vers midi
   workflow_dispatch:          # et le bouton « Run workflow » pour lancer à la main
 
 permissions:
@@ -13,11 +13,11 @@ permissions:
 
 jobs:
   extraire:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04     # version fixée : ubuntu-latest change de version sans prévenir
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -28,7 +28,14 @@ jobs:
           FT_CLIENT_ID: ${{ secrets.FT_CLIENT_ID }}
           FT_CLIENT_SECRET: ${{ secrets.FT_CLIENT_SECRET }}
         run: |
-          python scripts/extraire.py
+          # l'API France Travail flanche parfois quelques minutes : trois essais, dix minutes d'écart
+          ok=0
+          for essai in 1 2 3; do
+            if python scripts/extraire.py; then ok=1; break; fi
+            echo "Extraction en échec (essai $essai sur 3)"
+            if [ "$essai" -lt 3 ]; then sleep 600; fi
+          done
+          [ "$ok" = 1 ]
           python scripts/resumer.py
 
       - name: Enregistrer la donnée du jour (commit + push)

@@ -266,7 +266,7 @@ function poserNavEtFiltres() {
   if (p) p.innerHTML =
     `<p style="margin:0 0 8px"><a href="mouvement.html#limites">Limites de ces chiffres</a></p>
      Chaîne : API France Travail → <code>scripts/extraire.py</code> → <code>data/brut/</code> (chaque version d'annonce, une seule fois) + <code>data/actives/</code> (les offres du jour) → <code>scripts/resumer.py</code> → <code>data/resume.json</code> → ces pages (GitHub Pages).
-     Une Action GitHub relance la collecte chaque matin à 7 h. Identifiants dans les secrets du dépôt, jamais dans le code.
+     Une Action GitHub relance la collecte chaque jour. Identifiants dans les secrets du dépôt, jamais dans le code.
      Dépôt de démonstration — M2 MOD, IAE Clermont Auvergne, séminaires métiers.`;
 }
 
