@@ -12,6 +12,7 @@ l'API France Travail, enregistre les offres du jour et publie les chiffres.
 | [Ce qu'on vous demande](https://vincentfavarin.github.io/metier/exigences.html) | expérience, diplôme, outils, compétences |
 | [Qui recrute](https://vincentfavarin.github.io/metier/recruteurs.html) | entreprises, secteurs, employeurs ouverts aux débutants |
 | [Le marché bouge](https://vincentfavarin.github.io/metier/mouvement.html) | les extractions successives, la fraîcheur des annonces |
+| [Alternance / stage](https://vincentfavarin.github.io/metier/offres.html) | offres CRM et expérience client, filtres simples, suivi privé des candidatures |
 
 Dossier de travail pour la séance « Écouter le marché de votre métier »
 (M2 MOD, IAE Clermont Auvergne). Dépôt de démonstration : il montre ce que
@@ -53,14 +54,25 @@ Hauts-de-Seine en tête ; 27 % des offres affichent un salaire, médiane
 
 ## Les métiers suivis
 
-23 codes ROME, choisis pour le M2 MOD parmi les 1 911 du référentiel France
+24 codes ROME, choisis pour le M2 MOD parmi les 1 911 du référentiel France
 Travail (la liste vit dans `scripts/extraire.py`, `METIERS`) : le cœur
 marketing (M1718 chargé de marketing digital, M1716, M1705, M1703, M1620,
-M1706, M1430, M1711), le digital (E1113 e-commerce, D1438, E1101 community
-manager, E1124, E1405 SEO, M1886, M1426, M1719 et E1406 influence — 0 offre
-aujourd'hui, on surveille) et, décochés par défaut, la frontière avec la
-communication et le commerce (E1112, E1103, E1107, E1404, D1506, D1415 CRM).
-Au 22/09/2026 : 3 362 offres actives.
+M1706, M1430, M1711), les achats (M1101 acheteur / acheteuse), le digital
+(E1113 e-commerce, D1438, E1101 community manager, E1124, E1405 SEO, M1886,
+M1426, M1719 et E1406 influence) et, décochés par défaut, la frontière avec
+la communication et le commerce (E1112, E1103, E1107, E1404, D1506, D1415 CRM).
+Au 22/09/2026 : 3 362 offres actives, avant l'ajout du métier acheteur.
+
+### Source complémentaire : Welcome to the Jungle
+
+Le site utilise une requête France Travail autorisée pour le code ROME M1101
+(Achats). À ce jour, nous n'avons pas identifié de documentation publique
+officielle donnant accès à une API de recherche et de republication des offres
+Welcome to the Jungle. L'interface du site expose des appels techniques à ses
+fournisseurs, mais cela ne vaut pas une autorisation d'usage ou de republication :
+ils ne sont donc pas utilisés comme source automatique. Pour importer ces offres,
+il faut un accès partenaire/documenté dont les conditions permettent explicitement
+la collecte quotidienne et l'affichage sur ce site public.
 
 ## La chaîne
 
@@ -69,7 +81,7 @@ API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl
                                             →  data/actives/<date>.csv         les offres actives du jour (rome, id)
                                             →  data/serie.csv                  par jour et par métier : total, nouvelles, modifiées
                        scripts/resumer.py   →  data/resume.json                ce que les pages affichent (+ data/geo/, cache des positions)
-                       index.html + 4 pages →  https://vincentfavarin.github.io/metier/
+                       index.html + pages →  https://vincentfavarin.github.io/metier/
                        .github/workflows/veille.yml : GitHub relance tout ça chaque jour
 ```
 
@@ -83,20 +95,50 @@ API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl
   (libellé texte → min/max annuels bruts), outils cités dans les descriptions
   (grille à adapter), position (lat/lon de l'API, sinon centre de la commune
   via geo.api.gouv.fr, sinon ville principale du département).
-- Cinq pages HTML statiques, un chantier par page, toutes servies telles quelles.
+- Six pages HTML statiques, un chantier par page, toutes servies telles quelles.
   Chacune charge `data/resume.json` et recalcule ses graphiques Chart.js dans le
   navigateur selon la sélection ; net mensuel estimé = brut × 0,78 / 12.
   - `index.html` — les filtres, les chiffres-clés, la carte Leaflet (survol =
     l'offre, clic = l'annonce sur France Travail), les départements, les
-    contrats, et les liens vers les quatre autres pages.
+    contrats, et les liens vers les autres pages.
   - `salaires.html` — ce que ça paie. `exigences.html` — ce qu'on vous demande.
     `recruteurs.html` — qui recrute. `mouvement.html` — le marché bouge, et les
     limites de ces chiffres (ancre `#limites`, liée depuis chaque pied de page).
-- `assets/commun.js` et `assets/commun.css` — ce que les cinq pages partagent :
+- `assets/commun.js` et `assets/commun.css` — ce que les pages partagent :
   chargement des données, panneau de filtres (mémorisé dans `localStorage`,
   replié ailleurs que sur l'accueil), barre de navigation, utilitaires et
   fabriques de graphiques. Une page ne contient que son HTML et son petit
   script `rendre(offres, D)`.
+
+## Chercher une alternance ou un stage
+
+La page [Alternance / stage](https://vincentfavarin.github.io/metier/offres.html)
+est conçue pour une première recherche :
+
+1. Écrivez un mot dans la recherche (par exemple « Salesforce », « emailing »
+   ou « Clermont ») ; il est comparé au titre, à l'employeur, au lieu et au
+   descriptif complet.
+2. Choisissez alternance/apprentissage ou stage, puis cochez le filtre local
+   pour le Puy-de-Dôme (département 63) si besoin.
+3. Sur chaque annonce, sélectionnez « À suivre », « Candidature envoyée »,
+   « Entretien » ou « Terminée ». Le bouton en bas de page efface ce suivi sur
+   cet appareil.
+
+Le suivi est conservé dans le stockage local du navigateur : il n'est pas ajouté
+à Git, au site public ou envoyé à France Travail. Il ne suit donc pas la personne
+sur un autre navigateur ou appareil ; sur un appareil partagé, le même profil
+navigateur peut laisser ce suivi visible à d'autres personnes. Les annonces sont
+actualisées avec la veille quotidienne existante.
+
+La sélection recherche dans les titres et descriptions les termes CRM,
+fidélisation, marketing relationnel, expérience/parcours client et relation
+client. Pour éviter le bruit du code ROME D1415, une annonce portant ce code
+doit aussi mentionner CRM, fidélisation, marketing relationnel ou expérience
+client ; D1415 seul ne signifie pas « métier CRM ». Les résultats sont dédoublonnés
+par l'identifiant France Travail. Les stages ne sont détectés que lorsqu'ils
+sont explicitement indiqués dans l'intitulé ou les champs de contrat : l'API ne
+fournit pas nécessairement une catégorie stage normalisée et cette liste n'est
+pas un catalogue exhaustif de tous les stages.
 
 ## Volume et limites GitHub
 
@@ -131,5 +173,14 @@ copy .env.example .env        (puis remplir avec ses identifiants francetravail.
 
 - Les identifiants sont dans `.env` (local) ou dans les secrets du dépôt
   (GitHub) : jamais dans un fichier versionné.
+- La recherche d'offres réutilise la même API et les mêmes secrets
+  `FT_CLIENT_ID` / `FT_CLIENT_SECRET` que la veille existante ; aucun secret
+  ni paramètre supplémentaire n'est nécessaire. Le descriptif public est inclus
+  dans le résumé des seules annonces pertinentes afin que la recherche locale
+  dans la page fonctionne.
+- Les annonces d'acheteur utilisent le même accès France Travail ; après
+  publication de ce changement, le prochain passage quotidien ajoutera M1101
+  à l'extraction. L'accès France Travail n'inclut pas l'API de Welcome to the
+  Jungle : ne collez pas de clé/identifiant dans le code ou dans une conversation.
 - Un canal, une requête, une date : chaque chiffre du site les affiche.
 - Pas de scraping de LinkedIn, APEC ou Indeed (interdit par leurs CGU).

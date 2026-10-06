@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trouver une alternance ou un stage — CRM et expérience client</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="assets/commun.css?v=4">
+</head>
+<body>
+<main>
+  <div id="nav-ici"></div>
+  <h1>Trouver une alternance ou un stage</h1>
+  <p class="sous" id="sous">Chargement des offres…</p>
+
+  <div class="phrase">
+    Les annonces affichées contiennent au moins un signe lié au <b>CRM</b>, à la
+    <b>fidélisation</b>, au <b>marketing relationnel</b>, à l'<b>expérience client</b>
+    ou à la <b>relation client</b>. Le code ROME D1415 est large : il couvre aussi la
+    vente et le service après-vente. Pour cette raison, une annonce D1415 doit en plus
+    parler de CRM, fidélisation, marketing relationnel ou expérience client ; le code
+    seul ne suffit pas. Vérifiez toujours le contenu de l'annonce avant de postuler.
+  </div>
+
+  <div class="carte" style="margin-top:16px">
+    <div class="recherche-commandes">
+      <label>Mot-clé dans le titre ou la description
+        <input id="mot-cle" type="search" placeholder="Ex. Salesforce, emailing, Clermont" autocomplete="off">
+      </label>
+      <label>Type de contrat
+        <select id="type-offre">
+          <option value="toutes">Alternance et stages</option>
+          <option value="alternance">Alternance / apprentissage</option>
+          <option value="stage">Stage</option>
+        </select>
+      </label>
+      <label>Mon suivi
+        <select id="filtre-suivi">
+          <option value="tous">Toutes les annonces</option>
+          <option value="non-suivies">Pas encore suivies</option>
+          <option value="a-suivre">À suivre</option>
+          <option value="postule">Candidature envoyée</option>
+          <option value="entretien">Entretien</option>
+          <option value="termine">Terminée</option>
+        </select>
+      </label>
+      <label class="case-local"><input id="local-63" type="checkbox"> Seulement dans le Puy-de-Dôme (63)</label>
+    </div>
+    <p class="note" id="compte-offres" aria-live="polite"></p>
+  </div>
+
+  <p class="note">Les catégories affichées sont repérées dans l'intitulé ou la description. Le champ de recherche filtre ces annonces sur le titre, l'employeur, le lieu et le descriptif complet. Les stages ne sont reconnus que si l'annonce les nomme explicitement ; une offre absente de l'API France Travail ne peut pas apparaître ici.</p>
+  <div class="vide" id="stockage-erreur" role="status" hidden></div>
+  <div class="offres-actions">
+    <p class="note">Votre suivi reste dans le stockage local de ce navigateur sur cet appareil. Il n'est pas envoyé à France Travail ni publié sur le site. Sur un appareil partagé, les personnes utilisant ce même profil de navigateur peuvent éventuellement y accéder.</p>
+    <button id="effacer-suivi" type="button">Effacer mon suivi sur cet appareil</button>
+  </div>
+  <div class="resultats-offres" id="resultats-offres"></div>
+  <footer id="pied"></footer>
+</main>
+
+<script src="assets/commun.js?v=4"></script>
+<script>
+const CLE_SUIVI = "metiers-suivi-candidatures-v1";
+const ETATS = [
+  ["", "Ne pas suivre"],
+  ["a-suivre", "À suivre"],
+  ["postule", "Candidature envoyée"],
+  ["entretien", "Entretien"],
+  ["termine", "Terminée"],
+];
+let toutesLesOffres = [];
+let suivis = {};
+let stockageDisponible = true;
+
+function texteNormalise(valeur) {
+  return String(valeur || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("fr-FR");
+}
+
+function annonceStage(o) {
+  return Boolean(o.stage) && !Boolean(o.alternance);
+}
+
+function offreCible(o) {
+  return Array.isArray(o.mots_cles) && o.mots_cles.length > 0;
+}
+
+function offresSansDoublons(offres) {
+  const parId = new Map();
+  for (const offre of offres) {
+    if (!offreCible(offre) || !offre.id) continue;
+    const actuelle = parId.get(offre.id);
+    if (!actuelle || (!actuelle.mots_cles?.length && offre.mots_cles?.length)) {
+      parId.set(offre.id, offre);
+    }
+  }
+  return [...parId.values()];
+}
+
+function lireSuivis() {
+  try {
+    const sauvegarde = JSON.parse(localStorage.getItem(CLE_SUIVI) || "{}");
+    if (sauvegarde && typeof sauvegarde === "object" && !Array.isArray(sauvegarde)) {
+      suivis = Object.fromEntries(Object.entries(sauvegarde).filter(([, etat]) =>
+        ETATS.some(([cle]) => cle && cle === etat)));
+    }
+  } catch (erreur) {
+    stockageDisponible = false;
+    afficherErreurStockage("Le suivi privé ne peut pas être lu dans ce navigateur. Les changements ne seront pas enregistrés.");
+  }
+}
+
+function afficherErreurStockage(message) {
+  const element = document.getElementById("stockage-erreur");
+  element.textContent = message;
+  element.hidden = false;
+}
+
+function modifierSuivi(id, nouvelEtat, controle) {
+  if (!stockageDisponible) return;
+  const ancienEtat = suivis[id];
+  if (nouvelEtat) suivis[id] = nouvelEtat;
+  else delete suivis[id];
+  try {
+    localStorage.setItem(CLE_SUIVI, JSON.stringify(suivis));
+    if (document.getElementById("filtre-suivi").value !== "tous") afficherOffres();
+  } catch (erreur) {
+    if (ancienEtat) suivis[id] = ancienEtat;
+    else delete suivis[id];
+    controle.value = ancienEtat || "";
+    stockageDisponible = false;
+    afficherErreurStockage("Impossible d'enregistrer le suivi privé (stockage indisponible ou plein). Vos changements ne seront pas conservés.");
+    document.querySelectorAll(".offre-recherche .suivi select").forEach(select => { select.disabled = true; });
+    document.getElementById("effacer-suivi").disabled = true;
+  }
+}
+
+function creerEtiquette(texte, classe = "") {
+  const etiquette = document.createElement("span");
+  etiquette.className = "etiq";
+  etiquette.style.background = classe === "local" ? "#137333" : "#5f6368";
+  etiquette.textContent = texte;
+  return etiquette;
+}
+
+function carteOffre(offre) {
+  const carte = document.createElement("article");
+  carte.className = "offre-recherche";
+
+  const titre = document.createElement("h3");
+  titre.textContent = offre.intitule || "Intitulé non précisé";
+  carte.append(titre);
+
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  const type = annonceStage(offre) ? "Stage" :
+    (offre.alternance || ["apprentissage", "professionnalisation"].includes(offre.nature) ? "Alternance / apprentissage" : "");
+  if (type) meta.append(creerEtiquette(type));
+  if (offre.dep === "63") meta.append(creerEtiquette("Puy-de-Dôme (63)", "local"));
+  for (const mot of (offre.mots_cles || [])) meta.append(creerEtiquette(mot));
+  meta.append(document.createTextNode(
+    [offre.entreprise, offre.lieu, offre.experience].filter(Boolean).join(" · ")
+  ));
+  carte.append(meta);
+
+  if (offre.description) {
+    const details = document.createElement("details");
+    const resume = document.createElement("summary");
+    resume.textContent = "Lire le descriptif complet";
+    const description = document.createElement("p");
+    description.className = "description";
+    description.textContent = offre.description;
+    details.append(resume, description);
+    carte.append(details);
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "suivi";
+  const suiviLabel = document.createElement("label");
+  suiviLabel.textContent = "Mon suivi :";
+  const select = document.createElement("select");
+  select.id = `suivi-${offre.id}`;
+  select.setAttribute("aria-label", `Suivi de ${offre.intitule || "cette annonce"}`);
+  suiviLabel.htmlFor = select.id;
+  select.disabled = !stockageDisponible;
+  for (const [cle, libelle] of ETATS) {
+    const option = document.createElement("option");
+    option.value = cle;
+    option.textContent = libelle;
+    option.selected = (suivis[offre.id] || "") === cle;
+    select.append(option);
+  }
+  select.addEventListener("change", () => modifierSuivi(offre.id, select.value, select));
+  actions.append(suiviLabel, select);
+
+  if (offre.url) {
+    const lien = document.createElement("a");
+    lien.href = offre.url;
+    lien.target = "_blank";
+    lien.rel = "noopener noreferrer";
+    lien.textContent = "Voir l'annonce sur France Travail";
+    actions.append(lien);
+  }
+  carte.append(actions);
+  return carte;
+}
+
+function afficherOffres() {
+  const mot = texteNormalise(document.getElementById("mot-cle").value.trim());
+  const typeChoisi = document.getElementById("type-offre").value;
+  const suiviChoisi = document.getElementById("filtre-suivi").value;
+  const localSeulement = document.getElementById("local-63").checked;
+
+  const resultat = toutesLesOffres.filter(o => {
+    const stage = annonceStage(o);
+    const alternance = Boolean(o.alternance) || ["apprentissage", "professionnalisation"].includes(o.nature);
+    if (typeChoisi === "stage" && !stage) return false;
+    if (typeChoisi === "alternance" && !alternance) return false;
+    if (typeChoisi === "toutes" && !stage && !alternance) return false;
+    if (localSeulement && o.dep !== "63") return false;
+    const suivi = suivis[o.id] || "";
+    if (suiviChoisi === "non-suivies" && suivi) return false;
+    if (suiviChoisi !== "tous" && suiviChoisi !== "non-suivies" && suivi !== suiviChoisi) return false;
+    if (mot) {
+      const texte = texteNormalise([
+        o.intitule, o.entreprise, o.lieu, o.description,
+      ].join(" "));
+      if (!texte.includes(mot)) return false;
+    }
+    return true;
+  });
+  const baseType = toutesLesOffres.filter(o => {
+    const stage = annonceStage(o);
+    const alternance = Boolean(o.alternance) || ["apprentissage", "professionnalisation"].includes(o.nature);
+    return typeChoisi === "stage" ? stage :
+      (typeChoisi === "alternance" ? alternance : stage || alternance);
+  });
+
+  resultat.sort((a, b) => (b.date || "").localeCompare(a.date || "") ||
+    String(a.intitule || "").localeCompare(String(b.intitule || ""), "fr"));
+  const zone = document.getElementById("resultats-offres");
+  zone.replaceChildren(...resultat.map(carteOffre));
+  const compte = document.getElementById("compte-offres");
+  compte.textContent = `${resultat.length} annonce${resultat.length > 1 ? "s" : ""} affichée${resultat.length > 1 ? "s" : ""} sur ${baseType.length} annonces ciblées de ce type de contrat, avant les filtres de lieu, de suivi et de mot-clé.`;
+  if (!resultat.length) {
+    const vide = document.createElement("p");
+    vide.className = "vide";
+    vide.textContent = "Aucune annonce ne correspond à ces filtres. Essayez un autre mot-clé ou retirez le filtre local.";
+    zone.append(vide);
+  }
+}
+
+function rendre(offres) {
+  toutesLesOffres = offresSansDoublons(offres);
+  lireSuivis();
+  document.getElementById("mot-cle").addEventListener("input", afficherOffres);
+  document.getElementById("type-offre").addEventListener("change", afficherOffres);
+  document.getElementById("filtre-suivi").addEventListener("change", afficherOffres);
+  document.getElementById("local-63").addEventListener("change", afficherOffres);
+  document.getElementById("effacer-suivi").addEventListener("click", () => {
+    if (!Object.keys(suivis).length || !window.confirm("Effacer le suivi de toutes les annonces enregistré sur cet appareil ?")) return;
+    try {
+      localStorage.removeItem(CLE_SUIVI);
+      suivis = {};
+      afficherOffres();
+    } catch (erreur) {
+      stockageDisponible = false;
+      afficherErreurStockage("Impossible d'effacer le suivi enregistré dans ce navigateur.");
+      document.getElementById("effacer-suivi").disabled = true;
+      document.querySelectorAll(".offre-recherche .suivi select").forEach(select => { select.disabled = true; });
+    }
+  });
+  document.getElementById("effacer-suivi").disabled = !stockageDisponible;
+  afficherOffres();
+}
+
+Commun.demarrer(rendre, null, { filtres: false });
+</script>
+</body>
+</html>

@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.min.css">
 <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="assets/commun.css?v=3">
+<link rel="stylesheet" href="assets/commun.css?v=4">
 </head>
 <body>
 <main>
@@ -34,7 +34,7 @@
       <button data-vue="paris">Île-de-France</button>
       <button data-fond="gris" class="actif">Fond gris</button>
       <button data-fond="osm">Fond OpenStreetMap</button>
-      <span class="legende"><span><i style="background:#0a5cff"></i>cœur marketing</span><span><i style="background:#ff6a00"></i>digital</span><span><i style="background:#8e8e93"></i>frontière</span></span>
+      <span class="legende"><span><i style="background:#0a5cff"></i>cœur marketing</span><span><i style="background:#ff6a00"></i>digital</span><span><i style="background:#00857a"></i>achats</span><span><i style="background:#8e8e93"></i>frontière</span></span>
     </div>
     <div id="map"></div>
     <p class="note" id="note-carte"></p></div>
@@ -47,6 +47,7 @@
   <!-- ============ 4. LE RESTE, PAGE PAR PAGE ============ -->
   <h2>Le reste, page par page <small>— vos filtres vous suivent</small></h2>
   <div class="liens">
+    <a class="lien" href="offres.html"><b>Trouver une alternance ou un stage</b><span>Offres CRM, fidélisation, marketing relationnel et expérience client, avec un suivi privé sur cet appareil.</span></a>
     <a class="lien" href="salaires.html"><b>Ce que ça paie</b><span><i id="cle-salaires">—</i> — fourchettes par niveau, par métier, par contrat, et Île-de-France ou ailleurs.</span></a>
     <a class="lien" href="exigences.html"><b>Ce qu'on vous demande</b><span><i id="cle-exigences">—</i> — expérience, formation, outils et compétences cités dans les annonces.</span></a>
     <a class="lien" href="recruteurs.html"><b>Qui recrute</b><span><i id="cle-recruteurs">—</i> — entreprises, secteurs, niveau de poste par métier, et les dernières offres.</span></a>
@@ -56,7 +57,7 @@
   <footer id="pied"></footer>
 </main>
 
-<script src="assets/commun.js?v=3"></script>
+<script src="assets/commun.js?v=4"></script>
 <script>
 /* ============ Accueil : chiffres, carte, départements, contrats ============ */
 let carte, calque;

@@ -34,7 +34,8 @@ RACINE = Path(__file__).resolve().parent.parent
 load_dotenv(RACINE / ".env")
 
 # Les métiers suivis : code ROME -> (libellé, groupe, coché par défaut sur la page).
-# Choisis pour le M2 Marketing Opérationnel et Digital ; la page permet de cocher/décocher.
+# Choisis pour le M2 Marketing Opérationnel et Digital, plus les achats ;
+# la page permet de cocher/décocher les métiers.
 METIERS = {
     # Cœur marketing
     "M1718": ("Chargé(e) de marketing digital", "Marketing", True),
@@ -45,6 +46,8 @@ METIERS = {
     "M1706": ("Chef(fe) de promotion des ventes", "Marketing", True),
     "M1430": ("Chargé(e) d'études commerciales", "Marketing", True),
     "M1711": ("Directeur(trice) du marketing", "Marketing", True),
+    # Achats
+    "M1101": ("Acheteur / Acheteuse", "Achats", True),
     # Digital, contenu, e-commerce
     "E1113": ("Responsable e-commerce", "Digital", True),
     "D1438": ("Assistant(e) e-commerce", "Digital", True),
