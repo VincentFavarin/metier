@@ -1,5 +1,5 @@
 /* ============================================================
-   commun.css — le style des cinq pages.
+   commun.css — le style des pages du site.
    Déplacé tel quel depuis l'ancien index.html, plus la barre de
    navigation, les liens-cartes de l'accueil et le panneau de
    filtres repliable.
@@ -67,7 +67,7 @@ a:hover { text-decoration:underline; }
 .leaflet-popup-content b { display:block; font-size:14px; margin-bottom:2px; }
 footer { margin-top:48px; color:var(--gris); font-size:.85rem; border-top:1px solid var(--trait); padding-top:16px; }
 
-/* ---- Barre de navigation, commune aux cinq pages ---- */
+/* ---- Barre de navigation, commune aux six pages ---- */
 .nav { display:flex; gap:4px; flex-wrap:wrap; margin:0 0 18px; }
 .nav a { padding:6px 12px; border-radius:99px; font-size:.92rem; color:var(--gris); border:1px solid transparent; }
 .nav a:hover { background:var(--carte); text-decoration:none; }
@@ -80,7 +80,7 @@ details.carte > summary::before { content:"\25B8"; color:var(--accent); }
 details.carte[open] > summary::before { content:"\25BE"; }
 details.carte[open] > summary { margin-bottom:14px; }
 
-/* ---- Liens-cartes de l'accueil vers les quatre autres pages ---- */
+/* ---- Liens-cartes de l'accueil vers les autres pages ---- */
 .liens { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(260px,100%), 1fr)); gap:12px; }
 a.lien { display:block; background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; color:var(--encre); }
 a.lien:hover { border-color:var(--accent); text-decoration:none; }
@@ -88,5 +88,23 @@ a.lien b { display:block; font-size:1.05rem; margin-bottom:4px; }
 a.lien span { color:var(--gris); font-size:.9rem; }
 a.lien span i { font-style:normal; color:var(--accent); font-weight:600; }
 
+.recherche-commandes { display:grid; grid-template-columns:minmax(240px, 2fr) repeat(3, minmax(150px, 1fr)); gap:12px; align-items:end; }
+.recherche-commandes label { display:grid; gap:5px; font-size:.9rem; font-weight:600; }
+.recherche-commandes input[type="search"], .recherche-commandes select { width:100%; min-height:42px; padding:8px 10px; border:1px solid var(--trait); border-radius:8px; background:#fff; color:var(--encre); font:inherit; }
+.recherche-commandes .case-local { display:flex; align-items:center; gap:8px; min-height:42px; }
+.recherche-commandes .case-local input { accent-color:var(--accent); }
+.resultats-offres { display:grid; gap:12px; margin-top:16px; }
+.offre-recherche { background:var(--carte); border:1px solid var(--trait); border-radius:12px; padding:16px; }
+.offre-recherche h3 { margin:0 0 4px; font-size:1.05rem; }
+.offre-recherche .meta { color:var(--gris); font-size:.9rem; display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.offre-recherche .description { white-space:pre-line; font-size:.92rem; }
+.offre-recherche details summary { color:var(--accent); cursor:pointer; font-size:.9rem; }
+.offre-recherche .suivi { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+.offre-recherche .suivi label { font-size:.88rem; font-weight:600; }
+.offre-recherche .suivi select { min-height:38px; padding:6px 10px; border:1px solid var(--trait); border-radius:8px; background:#fff; font:inherit; }
+.offres-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:12px; }
+.offres-actions button { font:inherit; padding:6px 12px; border:1px solid var(--trait); border-radius:8px; background:#fff; cursor:pointer; }
+.offres-actions button:hover { border-color:var(--accent); color:var(--accent); }
 @media (max-width:880px) { .filtres { grid-template-columns:1fr; } }
-@media (max-width:480px) { main { padding:20px 12px 48px; } h1 { font-size:1.45rem; } #map { height:420px; } }
+@media (max-width:880px) { .recherche-commandes { grid-template-columns:1fr 1fr; } }
+@media (max-width:480px) { main { padding:20px 12px 48px; } h1 { font-size:1.45rem; } #map { height:420px; } .recherche-commandes { grid-template-columns:1fr; } }

@@ -95,11 +95,37 @@ CONTRATS = {
 }
 
 NATURES = [
+    ("stage", "stage"),
     ("apprentissage", "apprentissage"),
     ("professionnalisation", "professionnalisation"),
     ("non salarié", "non_salarie"),
     ("contrat travail", "salarie"),
 ]
+
+MOTS_CLES_CIBLES = {
+    "CRM": re.compile(
+        r"(?<![\w])crm(?![\w])|customer relationship management|gestion de la relation client",
+        re.IGNORECASE,
+    ),
+    "Fidélisation": re.compile(
+        r"fidélis\w*|fidelis\w*|loyalty|rétention client|retention client",
+        re.IGNORECASE,
+    ),
+    "Marketing relationnel": re.compile(
+        r"marketing relationnel|marketing automation|emailing relationnel",
+        re.IGNORECASE,
+    ),
+    "Expérience client": re.compile(
+        r"expérience client|experience client|customer experience|parcours client|customer journey",
+        re.IGNORECASE,
+    ),
+    "Relation client": re.compile(
+        r"relation client(?:èle)?|customer relations?",
+        re.IGNORECASE,
+    ),
+}
+MOTS_CLES_CRM_D1415 = {"CRM", "Fidélisation", "Marketing relationnel", "Expérience client"}
+REGEX_STAGE = re.compile(r"\bstages?\b|stagiaires?", re.IGNORECASE)
 
 # Niveau de formation demandé : du plus faible au plus élevé (l'ordre sert aussi à l'affichage).
 FORMATIONS = ["< Bac", "Bac", "Bac+2", "Bac+3/4", "Bac+5"]
@@ -120,7 +146,7 @@ def contrat_libelle(code):
 
 
 def nature(o):
-    """natureContrat -> 'apprentissage' | 'professionnalisation' | 'salarie' | 'non_salarie' | 'autre'."""
+    """natureContrat -> 'stage' | 'apprentissage' | 'professionnalisation' | etc."""
     lib = (o.get("natureContrat") or "").lower()
     if not lib:
         return "autre"
@@ -128,6 +154,47 @@ def nature(o):
         if motif in lib:
             return cle
     return "autre"
+
+
+def est_stage(o):
+    """Repère un stage seulement si le contrat ou l'intitulé l'indique explicitement."""
+    nature_contrat = (o.get("natureContrat") or "").lower()
+    type_contrat = (o.get("typeContrat") or "").lower()
+    return (
+        "stage" in nature_contrat
+        or type_contrat in {"stg", "stage"}
+        or bool(REGEX_STAGE.search(o.get("intitule") or ""))
+    )
+
+
+def est_alternance(o):
+    """Reconnaît l'alternance à partir du booléen ou de la nature du contrat API."""
+    return bool(o.get("alternance")) or nature(o) in {
+        "apprentissage", "professionnalisation",
+    }
+
+
+def mots_cles_cibles(o, rome=None):
+    """Catégories trouvées dans l'intitulé ou la description de l'annonce."""
+    texte = f"{o.get('intitule') or ''} {o.get('description') or ''}"
+    trouves = [nom for nom, rx in MOTS_CLES_CIBLES.items() if rx.search(texte)]
+    romes = {rome} if isinstance(rome, str) else set(rome or [o.get("rome")])
+    # D1415 recouvre beaucoup de postes de vente et de service après-vente :
+    # « relation client » seul ne suffit pas à en faire une offre CRM ciblée.
+    if "D1415" in romes and not MOTS_CLES_CRM_D1415.intersection(trouves):
+        return []
+    return trouves
+
+
+def rome_principal_par_id(actives):
+    """Choisit un seul ROME par identifiant, en préférant les codes autres que D1415."""
+    codes_par_id = defaultdict(set)
+    for rome, oid in actives:
+        codes_par_id[oid].add(rome)
+    return {
+        oid: sorted(codes - {"D1415"})[0] if codes - {"D1415"} else "D1415"
+        for oid, codes in codes_par_id.items()
+    }
 
 
 def exp_ans(lib):
@@ -295,11 +362,22 @@ def main():
 
     geo = Geocodeur()
     offres = []
+    rome_principal = rome_principal_par_id(actives)
+    codes_par_id = defaultdict(set)
     for rome, oid in actives:
+        codes_par_id[oid].add(rome)
+    ids_ajoutes = set()
+    for rome, oid in actives:
+        if oid in ids_ajoutes:
+            continue
+        if rome != rome_principal[oid]:
+            continue
         v = versions.get(oid)
         if not v:
             continue
         o = v["offre"]
+        mots_cles = mots_cles_cibles(o, codes_par_id[oid])
+        ids_ajoutes.add(oid)
         lieu = o.get("lieuTravail") or {}
         texte = (o.get("intitule") or "") + " " + (o.get("description") or "")
         t = texte.lower()
@@ -315,7 +393,10 @@ def main():
             "lat": lat, "lon": lon, "prec": precision,
             "contrat": o.get("typeContrat"),
             "experience": o.get("experienceLibelle"),
-            "alternance": bool(o.get("alternance")),
+            "alternance": est_alternance(o),
+            "stage": est_stage(o),
+            "mots_cles": mots_cles,
+            "description": (o.get("description") or "") if mots_cles else "",
             "salaire": (o.get("salaire") or {}).get("libelle"),
             "smin": smin, "smax": smax,
             "date": (o.get("dateCreation") or "")[:10],

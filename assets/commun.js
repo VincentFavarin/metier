@@ -1,7 +1,6 @@
 /* ============================================================
-   commun.js — ce que les cinq pages partagent.
-   Chargé par index.html, salaires.html, exigences.html,
-   recruteurs.html et mouvement.html, après Chart.js.
+   commun.js — ce que les pages du site partagent.
+   Chargé par les pages du site, après Chart.js.
 
    Tout est déclaré au premier niveau : le petit script de chaque
    page peut donc appeler directement euro(), barres(), NIVEAUX…
@@ -59,7 +58,7 @@ const dateFr = (s, bref = false) => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(
 const age = o => { const jour = Date.parse(D.date), t = Date.parse(o.date); return (isFinite(jour) && isFinite(t)) ? (jour - t) / 86400000 : null; };
 
 const couleur = "#0a5cff", pale = "rgba(10,92,255,.25)";
-const COULEURS = { Marketing: "#0a5cff", Digital: "#ff6a00", Frontière: "#8e8e93" };
+const COULEURS = { Marketing: "#0a5cff", Digital: "#ff6a00", Frontière: "#8e8e93", Achats: "#00857a" };
 // Palette des niveaux : du clair au foncé, assistant → directeur, « autre » en gris. Valable sur toute la page.
 const COUL_NIV = { assistant: "#a7c9ff", charge: "#5f9bf5", responsable: "#2a6ad4", directeur: "#123a7a", autre: "#b4b4bc" };
 // Sur ces trois teintes claires, le texte blanc n'est pas lisible : on écrit en encre foncée.
@@ -218,6 +217,7 @@ function filtrer(f) {
    ============================================================ */
 const PAGES = [
   ["index.html", "Accueil"],
+  ["offres.html", "Alternance / stage"],
   ["salaires.html", "Ce que ça paie"],
   ["exigences.html", "Ce qu'on vous demande"],
   ["recruteurs.html", "Qui recrute"],
@@ -249,13 +249,13 @@ const HTML_FILTRES = `
   </div>
   <p class="compte" id="compte"></p>`;
 
-function poserNavEtFiltres() {
+function poserNavEtFiltres(avecFiltres = true) {
   const n = document.getElementById("nav-ici");
   if (n) n.outerHTML = `<nav class="nav">` + PAGES.map(([url, lib]) =>
     `<a href="${url}"${url === PAGE_ICI ? ' class="ici" aria-current="page"' : ""}>${lib}</a>`).join("") + `</nav>`;
 
   const f = document.getElementById("filtres-ici");
-  if (f) f.outerHTML = (PAGE_ICI === "index.html"
+  if (f && avecFiltres) f.outerHTML = (PAGE_ICI === "index.html"
     // Accueil : le panneau est déplié, c'est le point de départ.
     ? `<div class="carte">${HTML_FILTRES}</div>`
     // Ailleurs : replié, on vient lire une page, pas refaire ses filtres.
@@ -307,9 +307,10 @@ const Commun = {
 
   /* rendre(offres, D) : rappelée au chargement puis à chaque changement de filtre.
      initier(D) : facultatif, une seule fois, avant le premier rendu. */
-  demarrer(rendre, initier) {
+  demarrer(rendre, initier, options = {}) {
     Commun.rendre = rendre;
-    poserNavEtFiltres();
+    const avecFiltres = options.filtres !== false;
+    poserNavEtFiltres(avecFiltres);
     // GitHub Pages met le JSON en cache 10 minutes : on le redemande frais à chaque chargement.
     fetch("data/resume.json", { cache: "no-cache" }).then(r => r.json()).then(d => {
       if (!d.metiers || !d.offres) throw new Error("ancien format de resume.json — rechargez la page (Ctrl+F5)");
@@ -322,6 +323,12 @@ const Commun = {
       const sous = document.getElementById("sous");
       if (sous) sous.innerHTML =
         `${d.source} · ${d.requete} · extraction du <b>${dateFr(d.date)}</b> · ${d.offres.length} offres actives, ${d.versions_conservees} versions d'annonces conservées`;
+
+      if (!avecFiltres) {
+        if (initier) initier(d);
+        Commun.rendre(d.offres, d);
+        return;
+      }
 
       let memo = null;
       try { memo = JSON.parse(localStorage.getItem("metiers-filtres")); } catch (e) {}
