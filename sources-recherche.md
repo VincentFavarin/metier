@@ -63,6 +63,62 @@ Les **mairies** passent par trois canaux : Choisir le service public (open data,
 France Travail (déjà branché) et leurs propres sites ou pages Facebook. Ces derniers sont épars,
 et c'est là que la collecte manuelle reste nécessaire.
 
+## 4. Petits sites et sites spécialisés (trouvés le 04/11/2026, non testés 🔎)
+
+Tous ces sites sont apparus dans des recherches web. Je n'ai pas encore pu vérifier leur
+`robots.txt` ni leurs CGU : sans vérification, la règle par défaut est la collecte manuelle.
+
+### Flux RSS publiés exprès : le canal le plus prometteur
+
+Un flux RSS est fait pour être lu par des programmes. C'est la voie la plus défendable après une
+API.
+
+| Source | Ce qu'elle publie |
+|---|---|
+| [Atlas des flux, rubrique emploi](https://atlasflux.saynete.net/atlas_des_flux_rss_fra_emploi.htm) | annuaire de flux RSS d'offres françaises (collectivités, administrations, organismes publics) : la meilleure porte d'entrée vers les petits sites |
+| [Emploi des centres sociaux](https://emploi.centres-sociaux.fr/flux-rss/) | un flux par région et par département |
+| [France Travail recrute](https://recrute.francetravail.org/Pages/Offre/ListeRss.aspx) (France Travail comme employeur) | flux par métier |
+| Pages carrière sous Talentsoft : [Amundi](https://jobs.amundi.com/offre-de-emploi/tous-les-flux-rss.aspx), [IRD](https://emploi-recrutement.ird.fr/job/all-rss-feeds.aspx), [JCDecaux](https://jcdecaux-recrute.talent-soft.com/offre-de-emploi/tous-les-flux-rss.aspx), [Astronics](https://francejobs.astronics.com/offre-de-emploi/tous-les-flux-rss.aspx) | flux par région, métier et contrat (CDI, CDD, stage, apprentissage). Tous ont la même adresse `…/tous-les-flux-rss.aspx` : d'autres employeurs sous Talentsoft en publient sans doute aussi |
+
+### Marketing, communication, digital
+
+[Isarta](https://isarta.fr/) · [LesJeudis](https://lesjeudis.com/) · We Are COM · Emploi-e-commerce ·
+cabinets : [Elaee](https://www.elaee.com/), [Michael Page](https://www.michaelpage.fr/jobs/communication/digital-marketing-communication),
+[Page Personnel](https://www.pagepersonnel.fr/jobs/marketing-digital-communication)
+
+### Stages et alternance
+
+1jeune1solution · [Portail de l'alternance](https://alternance.emploi.gouv.fr) · L'Étudiant ·
+[Stage.fr](https://www.stage.fr/) · Kapstages · Studyrama Emploi · Direct Étudiant · Walt Community ·
+JobIRL · 1 élève 1 stage · Myfuturepass (stages dans la fonction publique) ·
+liste de référence de l'[Onisep](https://www.onisep.fr/vers-l-emploi/stages-en-entreprises/stages-ou-trouver-des-offres)
+
+### Régional : Auvergne-Rhône-Alpes, Clermont-Ferrand
+
+[Nos Talents Nos Emplois](https://nostalentsnosemplois.auvergnerhonealpes.fr/), la plateforme de
+la Région (plus de 130 000 offres d'après [Centre Inffo](https://www.centre-inffo.fr/site-regions-formation/actualites-regions/auvergne-rhone-alpes-le-site-web-nos-talents-nos-emplois-propose-des-offres-demploi-de-stages-et-dalternance)) ·
+Jobsora (agrégateur)
+
+### Économie sociale et solidaire, associations
+
+[Emploi-ESS (UDES)](https://www.emploi-ess.fr/) · [Jobimpact](https://jobimpact.fr/offres-emploi) ·
+Jobsense · Job For Change · Jobs That Makesense (déjà relayé par France Travail) ·
+Solidarité Emploi · espace emploi des Scop · COORACE · offres des CRESS régionales
+
+### Europe
+
+| Pays | Sites |
+|---|---|
+| Union européenne | [EURES](https://europa.eu/eures/portal/) (portail public, 31 pays) · [EuroBrussels](https://www.eurobrussels.com/) (institutions de l'UE) · Europass |
+| Espagne | InfoJobs |
+| Suisse | jobs.ch · jobup.ch (Suisse romande) · Zentraljob |
+| Allemagne | Bundesagentur für Arbeit (API, section 1) |
+| Royaume-Uni | Reed (API, section 1) |
+
+Pour la Belgique, l'Italie et le Luxembourg, la recherche n'a fait apparaître aucun site
+national, à part EURES. Les services publics de l'emploi de ces pays (VDAB, Forem, Actiris en
+Belgique, ADEM au Luxembourg, ANPAL en Italie) restent à vérifier un par un.
+
 ## Sources
 
 - [Choisir le service public sur data.gouv.fr](https://www.data.gouv.fr/datasets/les-offres-diffusees-sur-choisir-le-service-public)
