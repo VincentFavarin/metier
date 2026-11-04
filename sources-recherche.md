@@ -99,6 +99,23 @@ liste de référence de l'[Onisep](https://www.onisep.fr/vers-l-emploi/stages-en
 la Région (plus de 130 000 offres d'après [Centre Inffo](https://www.centre-inffo.fr/site-regions-formation/actualites-regions/auvergne-rhone-alpes-le-site-web-nos-talents-nos-emplois-propose-des-offres-demploi-de-stages-et-dalternance)) ·
 Jobsora (agrégateur)
 
+### Local : Clermont-Ferrand, Puy-de-Dôme et autres territoires
+
+| Source | Ce qu'elle publie | Remarque |
+|---|---|---|
+| [Ville de Clermont-Ferrand sur Emploi-territorial](https://www.emploi-territorial.fr/emploi-mobilite/?search-col=14099) | postes de la commune (9 offres au moment de la recherche) | pas d'API ; une partie des offres est reprise dans le CSV de Choisir le service public |
+| Centre de gestion de la fonction publique territoriale du Puy-de-Dôme (CDG 63) | offres des communes du département | son site n'est pas apparu dans la recherche : à trouver |
+| [Ministère de l'Intérieur, offres dans le Puy-de-Dôme](https://ministereinterieur-career.talent-soft.com/offre-de-emploi/liste-toutes-offres.aspx?changefacet=1&facet_JobDepartment=246&facet_JobRegion=-198) | préfecture et services de l'État (34 offres) | sous Talentsoft, donc probablement aussi en flux RSS (`…/tous-les-flux-rss.aspx`) |
+| [France Travail, Puy-de-Dôme](https://candidat.francetravail.fr/offres/recherche?lieux=63D) | environ 7 000 offres | déjà couvert par l'API |
+| [Randstad Clermont-Ferrand](https://www.randstad.fr/emploi/puy-de-dome/clermont-ferrand/) | intérim local | site d'agence d'intérim |
+| [Annuaire-mairie, offres à Clermont-Ferrand](https://www.annuaire-mairie.fr/offre-emploi-clermont-ferrand.html) | agrégateur local | |
+| [Ouest-France Emploi](https://www.ouestfrance-emploi.com/) (Bretagne et Grand Ouest), Emploi Toulouse Métropole, Emploi collectivités | sites régionaux et territoriaux | cités dans le [répertoire de Taleez](https://taleez.com/jobboards) ; Ouest-France est déjà relayé par France Travail |
+
+La recherche n'a fait apparaître ni le site emploi de Clermont Auvergne Métropole, ni celui du
+CCAS, ni de site régional propre à l'Auvergne, au Limousin ou à l'Alsace. Restent à chercher un
+par un : les rubriques emploi des intercommunalités, des chambres consulaires (CCI, CMA) et des
+journaux régionaux (La Montagne pour l'Auvergne).
+
 ### Économie sociale et solidaire, associations
 
 [Emploi-ESS (UDES)](https://www.emploi-ess.fr/) · [Jobimpact](https://jobimpact.fr/offres-emploi) ·
