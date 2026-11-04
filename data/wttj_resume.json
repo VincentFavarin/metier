@@ -1,0 +1,200 @@
+{
+ "date": "2026-11-04",
+ "source": "Welcome to the Jungle — sitemaps publics (robots.txt), offres en français",
+ "methode": "métier déduit des mots de l'intitulé dans l'URL ; aucune page d'offre lue",
+ "total": 1569,
+ "par_metier": [
+  [
+   "Chargé(e) de communication (E1112)",
+   382
+  ],
+  [
+   "Responsable e-commerce (E1113)",
+   271
+  ],
+  [
+   "Chargé(e) de marketing digital (M1718)",
+   187
+  ],
+  [
+   "Chef(fe) de produit (M1703)",
+   123
+  ],
+  [
+   "Chargé(e) de relation client (CRM) (D1415)",
+   114
+  ],
+  [
+   "Chef(fe) de projet événementiel (E1107)",
+   107
+  ],
+  [
+   "Social media manager (E1124)",
+   73
+  ],
+  [
+   "Référenceur(se) web (SEO) (E1405)",
+   67
+  ],
+  [
+   "Chargé(e) des relations avec les influenceurs (M1719)",
+   51
+  ],
+  [
+   "Responsable marketing (M1705)",
+   50
+  ],
+  [
+   "Community manager (E1101)",
+   44
+  ],
+  [
+   "Assistant(e) marketing (M1620)",
+   34
+  ],
+  [
+   "Chef(fe) de projet web (M1886)",
+   25
+  ],
+  [
+   "Chargé(e) des relations publiques (E1103)",
+   20
+  ],
+  [
+   "Directeur(trice) du marketing (M1711)",
+   16
+  ],
+  [
+   "Chargé(e) d'études commerciales (M1430)",
+   4
+  ],
+  [
+   "Directeur(trice) marketing digital (M1716)",
+   1
+  ]
+ ],
+ "entreprises": [
+  [
+   "decathlon",
+   118
+  ],
+  [
+   "ministere de l interieur",
+   55
+  ],
+  [
+   "hermes",
+   52
+  ],
+  [
+   "havas sa",
+   34
+  ],
+  [
+   "auchan",
+   33
+  ],
+  [
+   "groupe credit agricole",
+   26
+  ],
+  [
+   "carrefour",
+   23
+  ],
+  [
+   "groupement les mousquetaires",
+   20
+  ],
+  [
+   "thales",
+   18
+  ],
+  [
+   "ministere des armees fr",
+   15
+  ],
+  [
+   "pernod ricard",
+   14
+  ],
+  [
+   "ministere de la culture",
+   13
+  ],
+  [
+   "webedia",
+   12
+  ],
+  [
+   "groupem6",
+   12
+  ],
+  [
+   "brico depot",
+   11
+  ]
+ ],
+ "villes": [
+  [
+   "paris",
+   600
+  ],
+  [
+   "puteaux",
+   41
+  ],
+  [
+   "levallois perret",
+   40
+  ],
+  [
+   "issy les moulineaux",
+   32
+  ],
+  [
+   "lyon",
+   25
+  ],
+  [
+   "courbevoie",
+   21
+  ],
+  [
+   "neuilly sur seine",
+   20
+  ],
+  [
+   "boulogne billancourt",
+   20
+  ],
+  [
+   "toulouse",
+   19
+  ],
+  [
+   "pantin",
+   19
+  ],
+  [
+   "marseille",
+   19
+  ],
+  [
+   "nanterre",
+   17
+  ],
+  [
+   "massy",
+   16
+  ],
+  [
+   "montrouge",
+   15
+  ],
+  [
+   "bordeaux",
+   13
+  ]
+ ]
+}
