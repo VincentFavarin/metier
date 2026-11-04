@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.min.css">
 <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="assets/commun.css?v=5">
+<link rel="stylesheet" href="assets/commun.css?v=6">
 </head>
 <body>
 <main>
@@ -41,16 +41,9 @@
   <div class="grille" style="margin-top:16px">
     <div class="carte"><h3>Par département <small>— les 15 premiers</small></h3><div class="zone"><canvas id="g-departements"></canvas></div></div>
     <div class="carte"><h3>Par type de contrat</h3><div class="zone"><canvas id="g-contrats"></canvas></div>
-      <p class="note">« Franchise », « Profession libérale » et « Profession commerciale » ne sont pas des emplois salariés : il s'agit de travailler à son compte. Le filtre « Indépendant », en haut, les regroupe.</p></div>
-  </div>
-
-  <!-- ============ 3 bis. WELCOME TO THE JUNGLE ============ -->
-  <h2>Et sur Welcome to the Jungle <small id="wttj-sous">— chargement…</small></h2>
-  <div class="grille">
-    <div class="carte"><h3>Par métier</h3><div class="zone"><canvas id="g-wttj-metiers"></canvas></div></div>
-    <div class="carte"><h3>Entreprises qui publient le plus <small>— les 15 premières</small></h3><div class="zone"><canvas id="g-wttj-entreprises"></canvas></div></div>
-    <div class="carte large"><h3>Villes <small>— les 15 premières</small></h3><div class="zone"><canvas id="g-wttj-villes"></canvas></div>
-      <p class="note">Comptages tirés des sitemaps publics du site (ceux que son robots.txt désigne aux moteurs de recherche) : aucune page d'offre n'est lue, aucune annonce n'est reproduite. Le métier est déduit des mots de l'intitulé : c'est plus approximatif que le code ROME de France Travail. Ces chiffres ne suivent pas les filtres et ne s'additionnent pas avec les offres France Travail ci-dessus.</p></div>
+      <p class="note">« Franchise », « Profession libérale » et « Profession commerciale » ne sont pas des emplois salariés : il s'agit de travailler à son compte. Le filtre « Indépendant », en haut, les regroupe. Adzuna et Welcome to the Jungle ne donnent pas toujours le contrat : il est alors lu dans l'intitulé (« CDI », « stage », « alternance »…), sinon « Non précisé ».</p></div>
+    <div class="carte large"><h3>Par source <small>— les offres de chaque site, découpées par niveau de poste</small></h3><div class="zone" style="height:220px"><canvas id="g-sources"></canvas></div>
+      <p class="note" id="note-sources"></p></div>
   </div>
 
   <!-- ============ 4. LE RESTE, PAGE PAR PAGE ============ -->
@@ -65,7 +58,7 @@
   <footer id="pied"></footer>
 </main>
 
-<script src="assets/commun.js?v=5"></script>
+<script src="assets/commun.js?v=6"></script>
 <script>
 /* ============ Accueil : chiffres, carte, départements, contrats ============ */
 let carte, calque;
@@ -98,7 +91,7 @@ function rendre(offres, D) {
     places++;
     const g = lib[o.rome] && lib[o.rome].groupe;
     const m = L.circleMarker([o.lat, o.lon], { radius: 6, color: "#fff", weight: 1, fillColor: COULEURS[g] || couleur, fillOpacity: o.prec === "departement" ? .45 : .9 });
-    m.bindPopup(`<b>${o.intitule}</b>${o.entreprise || "employeur non précisé"} · ${o.lieu || ""}<br>${libContratOffre(o)}${salaireCourt(o) ? " · " + salaireCourt(o) : ""}<br><span style="color:#888">${(lib[o.rome] && lib[o.rome].libelle) || o.rome} · ${libNiv(niv(o))}${o.prec !== "offre" ? " · position : " + o.prec : ""}</span>`, { closeButton: false });
+    m.bindPopup(`<b>${esc(o.intitule)}</b>${esc(o.entreprise || "employeur non précisé")} · ${esc(o.lieu || "")}<br>${libContratOffre(o)}${salaireCourt(o) ? " · " + esc(salaireCourt(o)) : ""}<br><span style="color:#888">${srcOffre(o)} · ${(lib[o.rome] && lib[o.rome].libelle) || o.rome} · ${libNiv(niv(o))}${o.prec !== "offre" ? " · position : " + o.prec : ""}</span>`, { closeButton: false });
     m.on("mouseover", function () { this.openPopup(); });
     m.on("mouseout", function () { this.closePopup(); });
     if (o.url) m.on("click", () => window.open(o.url, "_blank", "noopener"));
@@ -113,6 +106,11 @@ function rendre(offres, D) {
   // ce graphique dit alors la même chose que le filtre, en un peu plus précis.
   const contrats = compter(offres, libContratOffre);
   barres("g-contrats", contrats.map(x => x[0]), contrats.map(x => x[1]), true, " offres");
+  const parSource = SOURCES.map(k => offres.filter(o => srcOffre(o) === k));
+  empilees("g-sources", SOURCES, parSource, true);
+  const doublons = offres.filter(o => o.doublon).length;
+  document.getElementById("note-sources").textContent =
+    `Une même annonce peut être publiée sur plusieurs sites : ${doublons} offre${doublons > 1 ? "s" : ""} de votre sélection ont le même intitulé et la même entreprise qu'une offre d'une autre source. Le critère « Doublons probables » du panneau de filtres les écarte.`;
 
   /* ---- Le chiffre-clé de chaque page ---- */
   const employeurs = new Set(offres.map(o => o.entreprise).filter(Boolean)).size;
@@ -149,16 +147,6 @@ document.querySelectorAll("[data-fond]").forEach(b => b.addEventListener("click"
 
 Commun.demarrer(rendre);
 
-/* ---- Welcome to the Jungle : comptages agrégés, indépendants des filtres ---- */
-fetch("data/wttj_resume.json").then(r => r.ok ? r.json() : null).then(W => {
-  const sous = document.getElementById("wttj-sous");
-  if (!W) { sous.textContent = "— pas encore de données"; return; }
-  sous.textContent = `— ${W.total.toLocaleString("fr-FR")} offres au ${W.date.split("-").reverse().join("/")}, sitemaps publics`;
-  for (const [id, lignes] of [["g-wttj-metiers", W.par_metier], ["g-wttj-entreprises", W.entreprises], ["g-wttj-villes", W.villes]]) {
-    zoneSelonBarres(id, lignes.length, 26);
-    barres(id, lignes.map(x => x[0]), lignes.map(x => x[1]), true, " offres");
-  }
-}).catch(() => { document.getElementById("wttj-sous").textContent = "— données indisponibles"; });
 </script>
 </body>
 </html>

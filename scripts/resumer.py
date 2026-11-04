@@ -30,6 +30,7 @@ import requests
 RACINE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RACINE / "scripts"))
 from extraire import METIERS  # noqa: E402  (la liste des métiers vit dans un seul fichier)
+from autres_sources import offres_autres_sources  # noqa: E402  (Adzuna, Welcome to the Jungle : data/sources/)
 
 # Les outils et compétences que l'on cherche dans les annonces : c'est VOTRE grille, adaptez-la.
 # Chaque entrée : libellé affiché -> variantes cherchées (mot entier, insensible à la casse).
@@ -92,6 +93,7 @@ CONTRATS = {
     "TTI": "Intérim",
     "CDS": "CDD senior",
     "REP": "Reprise d'entreprise",
+    "STG": "Stage",          # autres sources seulement : France Travail ne publie pas de stages
 }
 
 NATURES = [
@@ -307,6 +309,7 @@ def main():
         lat, lon, precision = geo.position(lieu)
         offres.append({
             "id": oid,
+            "source": "France Travail",
             "rome": rome,
             "intitule": o.get("intitule"),
             "entreprise": (o.get("entreprise") or {}).get("nom"),
@@ -334,7 +337,17 @@ def main():
             "temps": temps_travail(o),
             "postes": int(o.get("nombrePostes") or 1),
         })
+    # Les autres sources, mises au même format : elles s'ajoutent aux offres France Travail.
+    nb_ft = len(offres)
+    autres, fichier_sources = offres_autres_sources(offres, geo, REGEX_OUTILS, niveau)
+    offres += autres
     geo.sauver()
+    sources = [{"nom": "France Travail", "offres": nb_ft, "date": jour, "detail": "API Offres d'emploi v2, extraction du jour"}]
+    for nom in ("Adzuna", "Welcome to the Jungle"):
+        k = sum(1 for o in autres if o["source"] == nom)
+        if k:
+            sources.append({"nom": nom, "offres": k, "date": fichier_sources.stem[-10:],
+                            "detail": f"fichier {fichier_sources.name}"})
 
     # Série : par jour et par métier
     serie = defaultdict(dict)
@@ -344,18 +357,19 @@ def main():
 
     resume = {
         "date": jour,
-        "source": "France Travail — API Offres d'emploi v2",
-        "requete": "une requête codeROME par métier, France entière",
+        "source": " + ".join(x["nom"] for x in sources),
+        "requete": "une requête codeROME par métier, France entière (France Travail) ; fichier consolidé data/sources/ (autres sources)",
+        "sources": sources,
         "metiers": [{"code": c, "libelle": l, "groupe": g, "coche": k,
                      "actives": sum(1 for o in offres if o["rome"] == c)}
                     for c, (l, g, k) in METIERS.items()],
         "outils": list(OUTILS),
         "contrats": {c: contrat_libelle(c)
-                     for c in sorted({o["contrat"] for o in offres if o["contrat"]})},
+                     for c in sorted({o.get("contrat") for o in offres if o.get("contrat")})},
         "niveaux": NIVEAUX_LIBELLES,
         "formations": FORMATIONS,
         "versions_conservees": nb_versions,
-        "sans_position": sum(1 for o in offres if o["lat"] is None),
+        "sans_position": sum(1 for o in offres if o.get("lat") is None),
         "serie": [{"date": d, "par_metier": m} for d, m in sorted(serie.items())],
         "offres": offres,
     }
@@ -363,11 +377,11 @@ def main():
     sortie.write_text(json.dumps(resume, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     prec = defaultdict(int)
     for o in offres:
-        prec[o["prec"]] += 1
+        prec[o.get("prec")] += 1
     print(f"Écrit : {sortie.relative_to(RACINE)} — {len(offres)} offres actives du {jour}, "
           f"{sortie.stat().st_size // 1024} Ko")
     print(f"Positions : {dict(prec)} ({geo.appels} appels geo.api.gouv.fr)")
-    avec = [o for o in offres if o["smin"] is not None]
+    avec = [o for o in offres if o.get("smin") is not None]
     part = 100 * len(avec) // len(offres) if offres else 0
     print(f"Salaire affiché par {len(avec)} offres sur {len(offres)} ({part} %)")
 

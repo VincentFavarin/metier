@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Le marché bouge — les métiers du marketing</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="assets/commun.css?v=5">
+<link rel="stylesheet" href="assets/commun.css?v=6">
 </head>
 <body>
 <main>
@@ -23,7 +23,12 @@
   </div>
 
   <h2 id="limites">Ce que ces chiffres n'autorisent pas à conclure</h2>
-  <p class="note">Un seul canal : France Travail n'héberge pas toutes les offres cadres (APEC, LinkedIn, Welcome to the Jungle en publient d'autres).
+  <p class="note">Trois sources réunies, qui ne disent pas la même chose : France Travail (API, extraction du jour, la seule qui donne la formation, la qualification, le secteur et les compétences), Adzuna (un agrégateur, qui reprend des annonces d'autres sites : certaines sont aussi sur France Travail) et Welcome to the Jungle (l'intitulé, l'entreprise et la ville ne sont lus que dans l'adresse de l'annonce ; le métier est déduit des mots de l'intitulé, plus approximatif que le code ROME). APEC et LinkedIn restent hors champ.
+  Additionner les sources compte deux fois une même annonce publiée sur plusieurs sites : le critère « Doublons probables » écarte celles qui ont le même intitulé et la même entreprise qu'une offre d'une autre source, ce rapprochement en laisse passer (un intitulé écrit autrement suffit).
+  Adzuna ne dit pas si un salaire est annuel, mensuel ou horaire : la période est déduite du montant (12 000 et plus : annuel ; moins de 100 : horaire ; sinon mensuel), les tarifs journaliers des freelances sont écartés des médianes, et les montants sont supposés bruts.
+  Le contrat des offres Adzuna et Welcome to the Jungle est souvent absent, ou lu dans l'intitulé (« CDI », « stage », « alternance ») ; Adzuna « contract » a été rendu par CDD.
+  Les outils sont cherchés dans l'intitulé et la description pour France Travail, dans l'intitulé et un extrait de description pour Adzuna, dans le seul intitulé pour Welcome to the Jungle : la part d'offres qui citent un outil est donc plus basse sur ces deux sources.
+  La date d'une offre Welcome to the Jungle est la dernière modification de sa page, pas forcément sa publication.
   Les salaires sont ceux des offres qui les affichent, moins d'un tiers : biais probable vers le bas et vers les PME ; le net mensuel est une estimation (brut × 0,78 / 12, avant impôt sur le revenu).
   Le niveau de poste (assistant·e, chargé·e, responsable, directeur·rice) est déduit de l'intitulé de l'annonce : c'est une approximation, un « chef de projet » n'encadre pas toujours.
   La formation et la qualification ne sont renseignées que par une minorité d'annonces : les pourcentages qui s'y rapportent portent sur ce petit sous-ensemble, pas sur tout le marché.
@@ -36,7 +41,7 @@
   <footer id="pied"></footer>
 </main>
 
-<script src="assets/commun.js?v=5"></script>
+<script src="assets/commun.js?v=6"></script>
 <script>
 /* ============ Le marché bouge ============ */
 function rendre(offres, D) {
@@ -48,7 +53,7 @@ function rendre(offres, D) {
     { scales: { y: { beginAtZero: true } } });
   document.getElementById("note-serie").textContent = serie.length < 2
     ? "Une seule extraction pour l'instant : la tendance apparaîtra au fil des jours, l'Action GitHub relance la collecte chaque matin."
-    : `${serie.length} extractions, du ${dateFr(serie[0].date)} au ${dateFr(serie[serie.length - 1].date)}. Ce compte suit les métiers cochés, pas les autres filtres.`;
+    : `${serie.length} extractions France Travail, du ${dateFr(serie[0].date)} au ${dateFr(serie[serie.length - 1].date)}. Ce compte suit les métiers cochés, pas les autres filtres ; Adzuna et Welcome to the Jungle n'y sont pas, leur fichier n'a qu'une date.`;
 
   const FRAIS = [["Moins de 7 jours", j => j < 7], ["7 à 30 jours", j => j >= 7 && j < 30], ["1 à 3 mois", j => j >= 30 && j < 90], ["Plus de 3 mois", j => j >= 90]];
   const ages = offres.map(age).filter(j => j != null && j >= 0);

@@ -71,8 +71,31 @@ API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl
                        scripts/resumer.py   →  data/resume.json                ce que les pages affichent (+ data/geo/, cache des positions)
                        index.html + 4 pages →  https://vincentfavarin.github.io/metier/
                        .github/workflows/veille.yml : GitHub relance tout ça chaque matin à 7 h
-API Adzuna (facultatif) → scripts/extraire_adzuna.py → data/adzuna/       à part, hors des chiffres du site (voir guide-adzuna.md)
+API Adzuna (facultatif) → scripts/extraire_adzuna.py → data/adzuna/       le brut Adzuna (positions, descriptions)
+Fichier consolidé      →  data/sources/<nom>-<date>.csv                    Adzuna + Welcome to the Jungle, fusionnés dans resume.json
+                          (lu par scripts/autres_sources.py, appelé par resumer.py)
 ```
+
+### Les autres sources, dans les mêmes chiffres
+
+Depuis le 04/11/2026, le site réunit trois sources dans les mêmes filtres, la même
+carte et les mêmes graphiques : France Travail (2 882 offres, extraction du jour),
+Adzuna (11 954) et Welcome to the Jungle (1 569), soit 16 405 offres. Les deux
+dernières viennent du fichier `data/sources/analyse_de_donnees-offre-2026-11-04.csv`
+(`source;id;rome;titre;entreprise;ville;departement;contrat;date;salaire;url`) ;
+`resumer.py` lit le plus récent de ce dossier et ignore ses lignes France Travail,
+prises dans l'extraction du jour. Pour mettre à jour, déposer un nouveau fichier
+daté dans `data/sources/`.
+
+- Un filtre « Source » s'ajoute au panneau ; chaque offre porte sa source.
+- Doublons entre sources (même intitulé, même entreprise) : champ `doublon`,
+  écartés par le critère « Doublons probables » (503 au 04/11/2026).
+- Salaires Adzuna : période déduite du montant (≥ 12 000 annuel, < 100 horaire,
+  sinon mensuel ; tarifs journaliers freelance écartés des médianes).
+- Positions : celle de l'offre Adzuna (`data/adzuna/`), sinon la ville retrouvée
+  parmi les offres déjà placées, sinon geo.api.gouv.fr (`data/geo/villes.json`).
+- La série du « Marché bouge » reste France Travail seul.
+- Les limites propres à chaque source sont sur `mouvement.html#limites`.
 
 - `scripts/extraire.py` — une requête `codeROME` par métier (token OAuth,
   pagination 150 / 1 150, total lu dans `Content-Range`). Le **brut est

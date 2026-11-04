@@ -24,6 +24,8 @@ function quantile(a, q) {
   return bas === haut ? s[bas] : s[bas] + (s[haut] - s[bas]) * (p - bas);
 }
 const compter = (liste, cle) => { const c = new Map(); for (const x of liste) { const k = cle(x); if (k == null || k === "") continue; c.set(k, (c.get(k) || 0) + 1); } return [...c].sort((a, b) => b[1] - a[1]); };
+// Texte venu d'une annonce, inséré dans du HTML : les autres sources ne garantissent pas qu'il soit propre.
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const court = (s, n) => !s ? "—" : (s.length > n ? s.slice(0, n - 1) + "…" : s);
 /* Le libellé de salaire de France Travail, rendu lisible : « Mensuel de 2500.0 Euros à
    2500.0 Euros » -> « 2 500 € brut par mois ». Le commentaire libre qui suit un tiret
@@ -70,6 +72,9 @@ const FORMATIONS_DEFAUT = ["< Bac", "Bac", "Bac+2", "Bac+3/4", "Bac+5"];
 const CONTRATS = [["cdi", "CDI"], ["cdd", "CDD"], ["alt", "Alternance"], ["mis", "Intérim"], ["indep", "Indépendant"], ["autre", "Autre"]];
 const AURA = new Set(["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"]);
 const IDF = new Set(["75", "77", "78", "91", "92", "93", "94", "95"]);
+// Les sources d'offres, fusionnées dans data/resume.json par scripts/resumer.py.
+const SOURCES = ["France Travail", "Adzuna", "Welcome to the Jungle"];
+const srcOffre = o => o.source || "France Travail";
 const EXPS = ["Débutant accepté", "Moins d'un an", "1 à 2 ans", "3 à 4 ans", "5 ans et plus", "Non précisé"];
 
 Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', sans-serif";
@@ -205,7 +210,7 @@ function flottantes(id, lignes) {
    ============================================================ */
 const cochees = sel => new Set([...document.querySelectorAll(sel + " input:checked")].map(i => i.value));
 function etatFiltres() {
-  return { metiers: cochees("#metiers"), contrats: cochees("#f-contrats"), niveaux: cochees("#f-niveaux"), qualite: cochees("#f-qualite") };
+  return { metiers: cochees("#metiers"), contrats: cochees("#f-contrats"), niveaux: cochees("#f-niveaux"), qualite: cochees("#f-qualite"), sources: cochees("#f-sources") };
 }
 
 /* Qualité des annonces : des critères d'exclusion, tous décochés par défaut.
@@ -217,7 +222,9 @@ const QUALITE = [
     ["salaire-faux", "Salaire invraisemblable", o => !!o.salaire && o.smin == null],
   ]],
   ["Doublons et ancienneté", [
-    ["doublon", "Doublons probables", o => !!o._doublon],
+    // _doublon : même intitulé, entreprise et lieu (marquerDoublons) ; doublon : même intitulé et
+    // même entreprise qu'une offre d'une autre source (scripts/autres_sources.py).
+    ["doublon", "Doublons probables", o => !!o._doublon || !!o.doublon],
     ["ancienne", "Publiée il y a plus de 90 jours", o => { const a = age(o); return a != null && a > 90; }],
   ]],
   ["Informations manquantes", [
@@ -250,7 +257,7 @@ function marquerDoublons(offres) {
 /* Les offres retenues par les quatre filtres. */
 function filtrer(f) {
   f = f || etatFiltres();
-  return D.offres.filter(o => f.metiers.has(o.rome) && f.contrats.has(familleContrat(o)) && f.niveaux.has(niv(o))
+  return D.offres.filter(o => f.sources.has(srcOffre(o)) && f.metiers.has(o.rome) && f.contrats.has(familleContrat(o)) && f.niveaux.has(niv(o))
     && !ecartee(o, f.qualite));
 }
 
@@ -281,6 +288,8 @@ const HTML_FILTRES = `
     <div>
       <h3>Type de contrat</h3>
       <div class="cases" id="f-contrats"></div>
+      <h3 style="margin-top:16px">Source</h3>
+      <div class="cases" id="f-sources"></div>
     </div>
     <div>
       <h3>Niveau de poste</h3>
@@ -315,8 +324,9 @@ function poserNavEtFiltres() {
   const p = document.getElementById("pied");
   if (p) p.innerHTML =
     `<p style="margin:0 0 8px"><a href="mouvement.html#limites">Limites de ces chiffres</a></p>
-     Chaîne : API France Travail → <code>scripts/extraire.py</code> → <code>data/brut/</code> (chaque version d'annonce, une seule fois) + <code>data/actives/</code> (les offres du jour) → <code>scripts/resumer.py</code> → <code>data/resume.json</code> → ces pages (GitHub Pages).
-     Une Action GitHub relance la collecte chaque matin à 7 h. Identifiants dans les secrets du dépôt, jamais dans le code.
+     Chaîne : API France Travail → <code>scripts/extraire.py</code> → <code>data/brut/</code> (chaque version d'annonce, une seule fois) + <code>data/actives/</code> (les offres du jour) ; Adzuna et Welcome to the Jungle → fichier consolidé <code>data/sources/</code> ; les deux → <code>scripts/resumer.py</code> → <code>data/resume.json</code> → ces pages (GitHub Pages).
+     Une Action GitHub relance la collecte France Travail chaque matin à 7 h ; le fichier des autres sources est celui de sa date.
+     Offres Adzuna : <a href="https://www.adzuna.fr" target="_blank" rel="noopener">Jobs by Adzuna</a>. Identifiants dans les secrets du dépôt, jamais dans le code.
      Dépôt de démonstration — M2 MOD, IAE Clermont Auvergne, séminaires métiers.`;
 }
 
@@ -334,13 +344,14 @@ const Commun = {
   rafraichir() {
     const f = etatFiltres();
     Commun.f = f;
-    const parMetier = D.offres.filter(o => f.metiers.has(o.rome));           // base des compteurs de filtres
+    const parMetier = D.offres.filter(o => f.metiers.has(o.rome) && f.sources.has(srcOffre(o)));   // base des compteurs de filtres
     const offres = filtrer(f);
     const n = offres.length, total = D.offres.length;
 
     // Compteurs dans les cases de filtre + ligne de synthèse
     CONTRATS.forEach(([k]) => { const e = document.getElementById("nb-c-" + k); if (e) e.textContent = parMetier.filter(o => familleContrat(o) === k).length; });
     NIVEAUX.forEach(([k]) => { const e = document.getElementById("nb-n-" + k); if (e) e.textContent = parMetier.filter(o => niv(o) === k).length; });
+    SOURCES.forEach((k, i) => { const e = document.getElementById("nb-s-" + i); if (e) e.textContent = D.offres.filter(o => f.metiers.has(o.rome) && srcOffre(o) === k).length; });
     // Qualité : combien d'offres chaque critère écarte parmi celles des trois autres filtres.
     const avantQualite = parMetier.filter(o => f.contrats.has(familleContrat(o)) && f.niveaux.has(niv(o)));
     Object.entries(REGLES_QUALITE).forEach(([k, r]) => { const e = document.getElementById("nb-q-" + k); if (e) e.textContent = avantQualite.filter(r).length; });
@@ -356,7 +367,7 @@ const Commun = {
     if (n === 0) { const d = document.querySelector("details.carte"); if (d) d.open = true; }
 
     // Mémorisation des quatre filtres ensemble : ils suivent d'une page à l'autre.
-    try { localStorage.setItem("metiers-filtres", JSON.stringify({ metiers: [...f.metiers], contrats: [...f.contrats], niveaux: [...f.niveaux], qualite: [...f.qualite] })); } catch (e) {}
+    try { localStorage.setItem("metiers-filtres", JSON.stringify({ metiers: [...f.metiers], contrats: [...f.contrats], niveaux: [...f.niveaux], qualite: [...f.qualite], sources: [...f.sources] })); } catch (e) {}
 
     Commun.rendre(offres, D);
   },
@@ -377,8 +388,11 @@ const Commun = {
       if (Array.isArray(d.formations) && d.formations.length) FORMATIONS = d.formations;
 
       const sous = document.getElementById("sous");
-      if (sous) sous.innerHTML =
-        `${d.source} · ${d.requete} · extraction du <b>${dateFr(d.date)}</b> · ${d.offres.length} offres actives, ${d.versions_conservees} versions d'annonces conservées`;
+      if (sous) sous.innerHTML = Array.isArray(d.sources) && d.sources.length > 1
+        ? `<b>${d.offres.length.toLocaleString("fr-FR")}</b> offres, trois sources réunies : ` + d.sources.map(x =>
+            `${x.nom} <b>${x.offres.toLocaleString("fr-FR")}</b> (${x.nom === "France Travail" ? "extraction" : "fichier"} du ${dateFr(x.date)})`).join(" · ")
+          + ` · ${d.versions_conservees} versions d'annonces France Travail conservées`
+        : `${d.source} · ${d.requete} · extraction du <b>${dateFr(d.date)}</b> · ${d.offres.length} offres actives, ${d.versions_conservees} versions d'annonces conservées`;
 
       let memo = null;
       try { memo = JSON.parse(localStorage.getItem("metiers-filtres")); } catch (e) {}
@@ -418,6 +432,14 @@ const Commun = {
       const memoN = memoA("niveaux", NIVEAUX.map(x => x[0]));
       document.getElementById("f-niveaux").innerHTML = NIVEAUX.map(([k, l]) =>
         `<label><input type="checkbox" value="${k}" ${memoN.includes(k) ? "checked" : ""}> <i class="pastille" style="background:${COUL_NIV[k]}"></i> ${l} <small id="nb-n-${k}"></small></label>`).join("");
+      // --- Filtre source : toutes cochées par défaut ---
+      const presentes = SOURCES.filter(k => d.offres.some(o => srcOffre(o) === k));
+      const memoS = memoA("sources", presentes);
+      document.getElementById("f-sources").innerHTML = SOURCES.map((k, i) => presentes.includes(k)
+        ? `<label><input type="checkbox" value="${k}" ${memoS.includes(k) ? "checked" : ""}> ${k} <small id="nb-s-${i}"></small></label>`
+        // Une source absente du résumé reste « cochée » en silence, pour qu'elle apparaisse quand elle arrive.
+        : `<input type="checkbox" value="${k}" checked hidden>`).join("");
+      document.getElementById("f-sources").addEventListener("change", Commun.rafraichir);
       document.getElementById("f-contrats").addEventListener("change", Commun.rafraichir);
       document.getElementById("f-niveaux").addEventListener("change", Commun.rafraichir);
       // --- Filtre qualité des annonces : tout décoché par défaut ---

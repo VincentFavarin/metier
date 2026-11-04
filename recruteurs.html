@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Qui recrute — les métiers du marketing</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="assets/commun.css?v=5">
+<link rel="stylesheet" href="assets/commun.css?v=6">
 </head>
 <body>
 <main>
@@ -29,7 +29,7 @@
   <footer id="pied"></footer>
 </main>
 
-<script src="assets/commun.js?v=5"></script>
+<script src="assets/commun.js?v=6"></script>
 <script>
 /* ============ Qui recrute ============ */
 function rendre(offres, D) {
@@ -71,10 +71,11 @@ function rendre(offres, D) {
   document.getElementById("liste-offres").innerHTML = recentes.length ? recentes.map(o => {
     const k = niv(o);
     return `<div class="item">
-      <div class="titre">${o.url ? `<a href="${o.url}" target="_blank" rel="noopener">${o.intitule}</a>` : o.intitule}</div>
-      <div class="meta"><span>${o.entreprise || "employeur non précisé"}</span><span>·</span><span>${o.lieu || "lieu non précisé"}</span>
+      <div class="titre">${o.url ? `<a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.intitule)}</a>` : esc(o.intitule)}</div>
+      <div class="meta"><span>${esc(o.entreprise || "employeur non précisé")}</span><span>·</span><span>${esc(o.lieu || "lieu non précisé")}</span>
         <span>·</span><span>${libContratOffre(o)}</span>
-        ${salaireCourt(o) ? `<span>·</span><span class="sal">${salaireCourt(o)}</span>` : ""}
+        ${salaireCourt(o) ? `<span>·</span><span class="sal">${esc(salaireCourt(o))}</span>` : ""}
+        <span>·</span><span>${srcOffre(o)}</span>
         <span class="etiq" style="background:${COUL_NIV[k]}${ENCRE_FONCEE.has(k) ? ";color:#1d1d1f" : ""}">${libNiv(k)}</span>
         <span>·</span><span>publiée le ${dateFr(o.date)}</span></div>
     </div>`;
