@@ -105,6 +105,23 @@ Jobsora (agrégateur)
 Jobsense · Job For Change · Jobs That Makesense (déjà relayé par France Travail) ·
 Solidarité Emploi · espace emploi des Scop · COORACE · offres des CRESS régionales
 
+### Stages et volontariat à l'étranger
+
+| Source | Nature | Remarque |
+|---|---|---|
+| Business France, VIE et VIA | volontariat international en entreprise ou en administration, offres publiées par les entreprises françaises | les sources divergent sur l'adresse actuelle de candidature (mon-vie-via.businessfrance.fr ou civiweb.com) : à vérifier |
+| [ErasmusIntern](https://erasmusintern.org) (réseau étudiant ESN) | stages en Europe | cité par l'[Agence Erasmus+ France](https://agence.erasmusplus.fr/profils/vous-souhaitez-partir-a-letranger/je-recherche-un-emploi-je-viens-de-terminer-mes-etudes/) ; Erasmus+ finance les stages mais ne publie pas d'offres |
+| [Portail européen de la jeunesse](https://youth.europa.eu/go-abroad/traineeships/es/abroad_en) | informations officielles de l'UE sur les stages Erasmus+ | |
+| EURES | emplois et stages, 31 pays | voir section 3 : pas d'API officielle |
+| Ministère des Affaires étrangères | stages, candidature en ligne | |
+| IAESTE | stages rémunérés techniques et scientifiques, 80 pays et plus | réseau étudiant |
+| AIESEC | stages et échanges, 120 pays et plus | passe par un comité local |
+| IFMSA, ELSA, IAAS | réseaux étudiants par discipline (médecine, droit, agronomie) | |
+| GoAbroad | annuaire de programmes, 100 pays et plus | souvent des programmes payants |
+| Transitions Abroad · InternshipMapper · EurActive | annuaires cités par [Euroguidance](https://www.euroguidance-france.org/stages-a-l-etranger/projet-stage/sites-bases-de-donnees/) | |
+| Global Experiences (AIFS) | stages encadrés, avec logement | payant |
+| GetMyVIE | alertes VIE | service privé payant, sans lien avec Business France |
+
 ### Europe
 
 | Pays | Sites |
