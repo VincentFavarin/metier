@@ -109,7 +109,7 @@ Jobsora (agrégateur)
 | [France Travail, Puy-de-Dôme](https://candidat.francetravail.fr/offres/recherche?lieux=63D) | environ 7 000 offres | déjà couvert par l'API |
 | [Randstad Clermont-Ferrand](https://www.randstad.fr/emploi/puy-de-dome/clermont-ferrand/) | intérim local | site d'agence d'intérim |
 | [Annuaire-mairie, offres à Clermont-Ferrand](https://www.annuaire-mairie.fr/offre-emploi-clermont-ferrand.html) | agrégateur local | |
-| [Ouest-France Emploi](https://www.ouestfrance-emploi.com/) (Bretagne et Grand Ouest), Emploi Toulouse Métropole, Emploi collectivités | sites régionaux et territoriaux | cités dans le [répertoire de Taleez](https://taleez.com/jobboards) ; Ouest-France est déjà relayé par France Travail |
+| Ouest-France Emploi (Bretagne et Grand Ouest), Emploi Toulouse Métropole, Emploi collectivités | sites régionaux et territoriaux | cités dans le [répertoire de Taleez](https://taleez.com/jobboards) ; Ouest-France est déjà relayé par France Travail |
 
 La recherche n'a fait apparaître ni le site emploi de Clermont Auvergne Métropole, ni celui du
 CCAS, ni de site régional propre à l'Auvergne, au Limousin ou à l'Alsace. Restent à chercher un
