@@ -10,7 +10,9 @@ Usage :
         3. écrit data_prive/wttj/sitemaps/<date>.csv : url, rome, entreprise, intitulé, ville, lastmod ;
         4. écrit data_prive/wttj/a_ouvrir.html : les offres nouvelles depuis le dernier passage, en
            liens cliquables, pour les ouvrir dans votre navigateur ;
-        5. affiche les statistiques du jour : offres par métier, entreprises, villes.
+        5. affiche les statistiques du jour : offres par métier, entreprises, villes ;
+        6. écrit data/wttj_resume.json : ces seuls comptages agrégés (aucune URL, aucun contenu
+           d'annonce), que la page d'accueil du site affiche.
 
     .venv\Scripts\python.exe scripts\extraire_wttj.py --pages "C:\chemin\pages_enregistrees"
         lit les pages d'offre que vous avez enregistrées depuis votre navigateur (Enregistrer sous…,
@@ -148,6 +150,29 @@ def passage_sitemaps():
     print(f"{aujourdhui} : {len(lignes)} offres WTTJ pour les métiers suivis, "
           f"{len(nouvelles)} nouvelles depuis {precedents[-1].stem if precedents else 'toujours'}.")
     stats(lignes)
+    resume_public(lignes, aujourdhui)
+
+
+def resume_public(lignes, jour):
+    """Les seuls chiffres publiés sur le site : comptages agrégés, sans URL ni contenu d'annonce."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from extraire import METIERS
+
+    def compte(cle, n=None):
+        return [[k, v] for k, v in collections.Counter(l[cle] for l in lignes if l[cle]).most_common(n)]
+
+    par_rome = compte("rome")
+    resume = {
+        "date": jour,
+        "source": "Welcome to the Jungle — sitemaps publics (robots.txt), offres en français",
+        "methode": "métier déduit des mots de l'intitulé dans l'URL ; aucune page d'offre lue",
+        "total": len(lignes),
+        "par_metier": [[f"{METIERS[c][0]} ({c})", v] for c, v in par_rome],
+        "entreprises": [[e.replace("-", " "), v] for e, v in compte("entreprise", 15)],
+        "villes": compte("ville", 15),
+    }
+    (RACINE / "data" / "wttj_resume.json").write_text(
+        json.dumps(resume, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def ecrire_liens(lignes, jour, depuis):

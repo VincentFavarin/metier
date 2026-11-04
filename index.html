@@ -44,6 +44,15 @@
       <p class="note">« Franchise », « Profession libérale » et « Profession commerciale » ne sont pas des emplois salariés : il s'agit de travailler à son compte. Le filtre « Indépendant », en haut, les regroupe.</p></div>
   </div>
 
+  <!-- ============ 3 bis. WELCOME TO THE JUNGLE ============ -->
+  <h2>Et sur Welcome to the Jungle <small id="wttj-sous">— chargement…</small></h2>
+  <div class="grille">
+    <div class="carte"><h3>Par métier</h3><div class="zone"><canvas id="g-wttj-metiers"></canvas></div></div>
+    <div class="carte"><h3>Entreprises qui publient le plus <small>— les 15 premières</small></h3><div class="zone"><canvas id="g-wttj-entreprises"></canvas></div></div>
+    <div class="carte large"><h3>Villes <small>— les 15 premières</small></h3><div class="zone"><canvas id="g-wttj-villes"></canvas></div>
+      <p class="note">Comptages tirés des sitemaps publics du site (ceux que son robots.txt désigne aux moteurs de recherche) : aucune page d'offre n'est lue, aucune annonce n'est reproduite. Le métier est déduit des mots de l'intitulé : c'est plus approximatif que le code ROME de France Travail. Ces chiffres ne suivent pas les filtres et ne s'additionnent pas avec les offres France Travail ci-dessus.</p></div>
+  </div>
+
   <!-- ============ 4. LE RESTE, PAGE PAR PAGE ============ -->
   <h2>Le reste, page par page <small>— vos filtres vous suivent</small></h2>
   <div class="liens">
@@ -139,6 +148,17 @@ document.querySelectorAll("[data-fond]").forEach(b => b.addEventListener("click"
 }));
 
 Commun.demarrer(rendre);
+
+/* ---- Welcome to the Jungle : comptages agrégés, indépendants des filtres ---- */
+fetch("data/wttj_resume.json").then(r => r.ok ? r.json() : null).then(W => {
+  const sous = document.getElementById("wttj-sous");
+  if (!W) { sous.textContent = "— pas encore de données"; return; }
+  sous.textContent = `— ${W.total.toLocaleString("fr-FR")} offres au ${W.date.split("-").reverse().join("/")}, sitemaps publics`;
+  for (const [id, lignes] of [["g-wttj-metiers", W.par_metier], ["g-wttj-entreprises", W.entreprises], ["g-wttj-villes", W.villes]]) {
+    zoneSelonBarres(id, lignes.length, 26);
+    barres(id, lignes.map(x => x[0]), lignes.map(x => x[1]), true, " offres");
+  }
+}).catch(() => { document.getElementById("wttj-sous").textContent = "— données indisponibles"; });
 </script>
 </body>
 </html>
