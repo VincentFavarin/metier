@@ -3,3 +3,5 @@
 # Environnement Python
 .venv/
 __pycache__/
+# Collectes de recherche : jamais publiées
+data_prive/
