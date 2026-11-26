@@ -1,17 +1,17 @@
 # Le marché de mon métier — les métiers du marketing
 
-### 👉 **[Voir le site : vincentfavarin.github.io/metier](https://vincentfavarin.github.io/metier/)**
+### 👉 **[Voir le site : h-wen-lin.github.io/metier](https://h-wen-lin.github.io/metier/)**
 
 Le site est mis à jour chaque matin par une Action GitHub : elle interroge
 l'API France Travail, enregistre les offres du jour et publie les chiffres.
 
 | | |
 |---|---|
-| [Accueil](https://vincentfavarin.github.io/metier/) | les filtres, les chiffres, la carte de France |
-| [Ce que ça paie](https://vincentfavarin.github.io/metier/salaires.html) | fourchettes par niveau, métier, contrat, territoire |
-| [Ce qu'on vous demande](https://vincentfavarin.github.io/metier/exigences.html) | expérience, diplôme, outils, compétences |
-| [Qui recrute](https://vincentfavarin.github.io/metier/recruteurs.html) | entreprises, secteurs, employeurs ouverts aux débutants |
-| [Le marché bouge](https://vincentfavarin.github.io/metier/mouvement.html) | les extractions successives, la fraîcheur des annonces |
+| [Accueil](https://h-wen-lin.github.io/metier/) | les filtres, les chiffres, la carte de France |
+| [Ce que ça paie](https://h-wen-lin.github.io/metier/salaires.html) | fourchettes par niveau, métier, contrat, territoire |
+| [Ce qu'on vous demande](https://h-wen-lin.github.io/metier/exigences.html) | expérience, diplôme, outils, compétences |
+| [Qui recrute](https://h-wen-lin.github.io/metier/recruteurs.html) | entreprises, secteurs, employeurs ouverts aux débutants |
+| [Le marché bouge](https://h-wen-lin.github.io/metier/mouvement.html) | les extractions successives, la fraîcheur des annonces |
 
 Dossier de travail pour la séance « Écouter le marché de votre métier »
 (M2 MOD, IAE Clermont Auvergne). Dépôt de démonstration : il montre ce que
@@ -69,7 +69,7 @@ API France Travail  →  scripts/extraire.py  →  data/brut/<mois>/<ROME>.jsonl
                                             →  data/actives/<date>.csv         les offres actives du jour (rome, id)
                                             →  data/serie.csv                  par jour et par métier : total, nouvelles, modifiées
                        scripts/resumer.py   →  data/resume.json                ce que les pages affichent (+ data/geo/, cache des positions)
-                       index.html + 4 pages →  https://vincentfavarin.github.io/metier/
+                       index.html + 4 pages →  https://h-wen-lin.github.io/metier/
                        .github/workflows/veille.yml : GitHub relance tout ça chaque matin à 7 h
 API Adzuna (facultatif) → scripts/extraire_adzuna.py → data/adzuna/       le brut Adzuna (positions, descriptions)
 Fichier consolidé      →  data/sources/<nom>-<date>.csv                    Adzuna + Welcome to the Jungle, fusionnés dans resume.json
